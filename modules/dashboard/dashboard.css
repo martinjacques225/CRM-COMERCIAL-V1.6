@@ -1,0 +1,45 @@
+/* ═══ DASHBOARD ═══ */
+.dash-grid {
+  display: grid; grid-template-columns: repeat(auto-fill,minmax(155px,1fr));
+  gap: 11px; margin-bottom: 20px;
+}
+.dash-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 15px;
+  animation: slideIn .18s both; transition: all var(--transition);
+}
+.dash-card:hover { box-shadow: var(--shadow-sm); }
+.dash-card.highlight { border-color: var(--primary); background: var(--primary-light); }
+.dash-card.highlight .dash-card-val { color: var(--primary); }
+.dash-card.success-card { border-color: #BBF7D0; background: var(--success-bg); }
+.dash-card.success-card .dash-card-val { color: var(--success); }
+.dash-card-label { font-size: .68rem; color: var(--text2); text-transform: uppercase; letter-spacing:.07em; font-weight:600; margin-bottom:7px; }
+.dash-card-val { font-size: 2rem; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; letter-spacing: -.02em; line-height: 1; }
+.dash-card-sub { font-size: .68rem; color: var(--text3); margin-top: 3px; }
+.section-title {
+  font-size: .72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--text3); margin-bottom: 11px; margin-top: 4px;
+}
+.dash-origins { display: flex; flex-direction: column; gap: 7px; margin-bottom: 20px; }
+.dash-origin-row { display: flex; align-items: center; gap: 10px; }
+.dash-origin-name { width: 90px; font-size: .76rem; color: var(--text2); flex-shrink:0; }
+.dash-origin-bar-wrap { flex:1; height: 5px; background: var(--surface3); border-radius: 99px; overflow: hidden; }
+.dash-origin-bar-fill { height:100%; background: var(--primary); border-radius: 99px; transition: width .8s ease; }
+.dash-origin-count { font-size: .76rem; font-weight:700; color: var(--text); width: 22px; text-align: right; }
+
+.activity-feed { display: flex; flex-direction: column; gap: 0; }
+.activity-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid var(--border-soft); font-size: .77rem;
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-icon {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--surface2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.activity-icon svg { width:13px; height:13px; }
+.activity-body { flex:1; }
+.activity-text { color: var(--text); line-height: 1.35; }
+.activity-time { font-size: .67rem; color: var(--text3); margin-top: 1px; font-family: var(--mono); }
+

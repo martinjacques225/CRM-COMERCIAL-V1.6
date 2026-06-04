@@ -1,0 +1,79 @@
+const CACHE = 'crm-v6';
+const ASSETS = [
+  // Shell
+  './index.html',
+  './styles.css',
+  './manifest.json',
+  // Core JS
+  './app.js',
+  './js/db.js',
+  './js/constants.js',
+  './js/state.js',
+  './js/utils.js',
+  './js/ui.js',
+  // Módulos de vista
+  './modules/agenda/agenda.js',
+  './modules/calculadora/calculadora.js',
+  './modules/configuracion/configuracion.js',
+  './modules/dashboard/dashboard.js',
+  './modules/leads/leads.js',
+  './modules/medallas/medallas.js',
+  './modules/modals/modals.js',
+  './modules/plantillas-wa/whatsapp.js',
+  './modules/respaldos/respaldos.js',
+  './modules/ventas/ventas.js',
+  // Assets
+  './icon-lgs.png',
+  './icon-crm-192.png',
+  './icon-crm-512.png',
+  './mascot-aria.png',
+  './mascot-titan.png',
+  './mascot-zen.png',
+  './mascot-max.png',
+  './mascot-nova.png',
+  './mascot-illidan.png'
+];
+
+// Install: cache all core assets
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE)
+      .then(c => c.addAll(ASSETS))
+      .then(() => self.skipWaiting())
+  );
+});
+
+// Activate: remove old caches
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
+});
+
+// Fetch: cache-first for local assets, network-first for external
+self.addEventListener('fetch', e => {
+  const url = new URL(e.request.url);
+  const isLocal = url.origin === self.location.origin;
+
+  if (isLocal) {
+    // Cache-first for local assets
+    e.respondWith(
+      caches.match(e.request).then(cached => {
+        if (cached) return cached;
+        return fetch(e.request).then(response => {
+          if (!response || response.status !== 200 || response.type !== 'basic') return response;
+          const clone = response.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+          return response;
+        }).catch(() => caches.match('./index.html'));
+      })
+    );
+  } else {
+    // Network-first for external (SheetJS CDN, WhatsApp, etc.)
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match(e.request))
+    );
+  }
+});
