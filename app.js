@@ -5,7 +5,7 @@
 // ── Capas base (vía capa de servicios, nunca IndexedDB directo) ──
 import { initDB, appointments, calls, config } from './services/index.js';
 import { S } from './js/state.js';
-import { addDays, todayStr, showFileError, toast, vibrate } from './js/utils.js';
+import { addDays, todayStr, showFileError, toast, vibrate, initAutoUpper } from './js/utils.js';
 
 // ── UI Shell ──
 import { ico, renderNav, renderBottomNav, renderTopbar, attachCardEvents,
@@ -28,7 +28,7 @@ import * as ModConfig    from './modules/configuracion/configuracion.js';
 import { openModal, closeModal,
          openFormModal, openFormModalFromLead, openLeadModal,
          openReagendarModal, openWAModal, openSaleModal,
-         deleteSale, deleteLead } from './modules/modals/modals.js';
+         deleteSale, deleteLead, deleteAppointment, appointmentToLead } from './modules/modals/modals.js';
 
 // ═══ NAVEGACIÓN ═══
 export function navigate(view) {
@@ -71,6 +71,9 @@ async function init() {
   const savedTheme = await config.get('theme') || 'light';
   document.documentElement.setAttribute('data-theme', savedTheme);
 
+  // Mayúsculas automáticas (por defecto activado; configurable en Configuración)
+  initAutoUpper(await config.get('autoMayusculas') !== false);
+
   // Registrar funciones en window._app para que los módulos las usen
   window._app = {
     // Navegación
@@ -83,10 +86,11 @@ async function init() {
     openReagendarModal, openWAModal, openSaleModal,
     closeModal,
     // Acciones de datos
-    deleteSale, deleteLead,
+    deleteSale, deleteLead, deleteAppointment, appointmentToLead,
     autoLogCall: (data) => autoLogCall(data, calls),
     // Helpers para módulos
     _getDebutActivo: () => config.get('debutActivo'),
+    setAutoUpper: initAutoUpper,
     requestNotifications
   };
 

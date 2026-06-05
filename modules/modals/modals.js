@@ -7,7 +7,7 @@
 //   - modal-wa.js     → openWAModal
 // Se mantiene este barrel para no romper imports existentes (app.js).
 export { openModal, closeModal } from './modal-core.js';
-export { openFormModal, openFormModalFromLead, openReagendarModal } from './modal-cita.js';
+export { openFormModal, openFormModalFromLead, openReagendarModal, deleteAppointment, appointmentToLead } from './modal-cita.js';
 export { openLeadModal, deleteLead } from './modal-lead.js';
 export { openSaleModal, deleteSale } from './modal-venta.js';
 export { openWAModal } from './modal-wa.js';

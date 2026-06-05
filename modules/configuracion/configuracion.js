@@ -10,6 +10,7 @@ export async function render() {
   const mascotId   = await config.get('mascota') || 'aria';
   const themeVal   = await config.get('theme') || 'light';
   const notifOn    = await config.get('notificaciones') !== false;
+  const autoMayus  = await config.get('autoMayusculas') !== false;
   const debutActivo= await config.get('debutActivo') || false;
   const filial     = await config.get('filial') || '';
   const equipo     = await config.get('equipo') || '';
@@ -75,6 +76,8 @@ export async function render() {
       <div class="config-field" style="margin-top:12px">
         <div class="toggle-row"><span class="toggle-label">Notificaciones de citas</span><button class="toggle${notifOn?' on':''}" id="notifToggle"></button></div>
         <div class="toggle-row" style="margin-top:8px"><span class="toggle-label">Auto-registrar llamadas</span><button class="toggle on"></button></div>
+        <div class="toggle-row" style="margin-top:8px"><span class="toggle-label">MAYÚSCULAS automáticas en formularios</span><button class="toggle${autoMayus?' on':''}" id="upperToggle"></button></div>
+        <div style="font-size:.68rem;color:var(--text3);margin-top:4px">Aplica mayúsculas a nombres, empresa, cargo, etc. Excluye correos y enlaces.</div>
       </div>
       <div style="margin-top:14px;padding:11px;background:var(--surface2);border-radius:var(--radius-sm);font-size:.75rem;color:var(--text2);line-height:1.5">
         💡 Al tocar "Llamar", la app registra la llamada y te pregunta el resultado al volver.
@@ -112,6 +115,7 @@ function _attachEvents() {
   });
   document.getElementById('debutToggle').addEventListener('click', async function () { const on = this.classList.toggle('on'); await config.set('debutActivo', on); toast(on?'Bono debut activado':'Bono debut desactivado'); });
   document.getElementById('notifToggle').addEventListener('click', async function () { const on = this.classList.toggle('on'); await config.set('notificaciones', on); if (on) window._app?.requestNotifications?.(); });
+  document.getElementById('upperToggle').addEventListener('click', async function () { const on = this.classList.toggle('on'); await config.set('autoMayusculas', on); window._app?.setAutoUpper?.(on); toast(on?'Mayúsculas automáticas activadas':'Mayúsculas automáticas desactivadas'); });
   document.getElementById('cfgSave').addEventListener('click', async () => {
     await config.set('userName',  document.getElementById('cfgNombre').value.trim());
     await config.set('cargo',     document.getElementById('cfgCargo').value);

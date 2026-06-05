@@ -3,7 +3,7 @@ import { appointments } from '../../services/appointment.service.js';
 import { leads } from '../../services/lead.service.js';
 import { templates } from '../../services/template.service.js';
 import { config } from '../../services/config.service.js';
-import { escHtml, formatDate } from '../../js/utils.js';
+import { escHtml, buildMessage } from '../../js/utils.js';
 import { openModal, closeModal } from './modal-core.js';
 
 // ── WhatsApp ──
@@ -12,6 +12,7 @@ export async function openWAModal(id, type = 'appt') {
   if (!target) return;
   const tmpls    = await templates.getAll();
   const userName = await config.get('userName') || 'Asesor';
+  const ctx      = { asesor: userName, cargo: await config.get('cargo') || '', filial: await config.get('filial') || '' };
   document.getElementById('modalTitle').textContent = 'Enviar WhatsApp';
   document.getElementById('modalBody').innerHTML = `
     <p style="font-size:.78rem;color:var(--text2);margin-bottom:10px">Para: <strong>${escHtml(target.nombre)}</strong> - ${escHtml(target.telefono||'')}</p>
@@ -21,26 +22,15 @@ export async function openWAModal(id, type = 'appt') {
     <div class="wa-preview"><div class="wa-bubble" id="waBubble"></div></div>`;
   const upd = () => {
     const t = tmpls.find(x => x.id === document.getElementById('waTmpl').value);
-    if (t) document.getElementById('waBubble').textContent = _buildWAMsg(t.contenido, target, userName);
+    if (t) document.getElementById('waBubble').textContent = buildMessage(t.contenido, target, ctx);
   };
   document.getElementById('waTmpl').addEventListener('change', upd); upd();
   openModal('Abrir WhatsApp');
   document.getElementById('modalSave').onclick = () => {
     const t = tmpls.find(x => x.id === document.getElementById('waTmpl').value); if (!t) return;
     const tel = (target.telefono||'').replace(/\D/g,'');
-    window.open(`https://wa.me/${tel}?text=${encodeURIComponent(_buildWAMsg(t.contenido, target, userName))}`, '_blank');
+    window.open(`https://wa.me/${tel}?text=${encodeURIComponent(buildMessage(t.contenido, target, ctx))}`, '_blank');
     closeModal();
   };
   document.getElementById('modalCancel').onclick = closeModal;
-}
-
-function _buildWAMsg(tmpl, target, ej) {
-  return tmpl
-    .replace(/\{\{nombre\}\}/g,   target.nombre   || '')
-    .replace(/\{\{telefono\}\}/g, target.telefono || '')
-    .replace(/\{\{fecha\}\}/g,    formatDate(target.fecha))
-    .replace(/\{\{hora\}\}/g,     target.hora     || '')
-    .replace(/\{\{zoom\}\}/g,     target.zoomLink || 'sin link')
-    .replace(/\{\{producto\}\}/g, target.interes  || '')
-    .replace(/\{\{ejecutivo\}\}/g, ej             || '');
 }

@@ -3,6 +3,35 @@
 
 ---
 
+## [3.3] — Correcciones funcionales (Fase pulido pre-Supabase)
+
+> Objetivo: corregir bugs funcionales y completar comportamientos comerciales sin tocar la capa de servicios ni la persistencia. Compatibilidad total con datos actuales. NO incluye Supabase, sincronización ni multiusuario.
+
+### Corregido
+- **Comisiones / Calculadora**: el campo numérico "¿Cuántas ventas?" se reiniciaba al escribir (no permitía varios dígitos). Causa raíz: el handler `input` re-renderizaba toda la vista en cada tecla, recreando el `<input>`. Ahora sólo se re-renderiza el bloque de resultado (`#calcResult`) sin tocar el input (`modules/calculadora/calculadora.js`).
+- **Plantillas WhatsApp — variables automáticas**: el reemplazo sólo soportaba `{{producto}}`/`{{ejecutivo}}`; variables con nombre natural (`{{plan}}`, `{{asesor}}`, `{{cliente}}`, etc.) quedaban literales. Se centralizó el llenado en `buildMessage()` con alias en español y limpieza de tokens desconocidos.
+
+### Añadido
+- **`utils.buildMessage(tmpl, target, ctx)`** — motor único de reemplazo de variables de plantillas (WhatsApp y futuros canales). Soporta alias: `cliente=nombre`, `plan=producto=interes`, `asesor=ejecutivo`, más `email/empresa/ciudad/cargo/filial/zoom`. Tokens no reconocidos se vacían.
+- **Mayúsculas automáticas** (`utils.initAutoUpper`) — convierte a MAYÚSCULAS los inputs de texto al perder el foco (no textareas). Excluye correos, URLs y campos técnicos. Configurable por el usuario (config `autoMayusculas`, por defecto activado) con toggle en Configuración. Feedback visual en vivo vía clase CSS `body.auto-upper`.
+- **Agenda — eliminar y devolver a Leads**:
+  - `deleteAppointment(id)`: elimina la cita; si provenía de un lead, lo libera (`agendado=false`, estado→Seguimiento) y registra historial.
+  - `appointmentToLead(id)`: devuelve la cita a Leads. Si tenía lead asociado lo recupera; si no, crea un nuevo lead desde los datos de la cita. Registra historial y elimina la cita.
+  - Botones "A Leads" y "Eliminar" en cada tarjeta de cita.
+
+### Regla de negocio
+- Al eliminar/devolver una cita ligada a un lead, el lead vuelve a estado **Seguimiento** y queda disponible para re-agendar. Toda acción queda en el historial del lead (`cita_eliminada`, `devuelto_a_leads`, `recuperado_de_agenda`).
+
+### Archivos modificados
+- `js/utils.js`, `js/ui.js`, `app.js`
+- `modules/calculadora/calculadora.js`, `modules/modals/modal-wa.js`, `modules/modals/modal-cita.js`, `modules/modals/modals.js`
+- `modules/plantillas-wa/whatsapp.js`, `modules/configuracion/configuracion.js`, `modules/agenda/agenda.js`, `styles.css`
+
+### Verificación
+- Inspección de código y pruebas de lógica aisladas (`buildMessage`). **Pendiente: prueba funcional en navegador** (PC + móvil + PWA) antes de commit/push.
+
+---
+
 ## [3.2] — Capa de Servicios y limpieza de deuda técnica (Fase Servicios)
 
 > Objetivo: desacoplar la app del almacenamiento mediante una capa de servicios estable, preparada para Supabase, **sin alterar comportamiento visible**. Compatibilidad total con datos actuales.

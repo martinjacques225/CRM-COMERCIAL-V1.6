@@ -19,6 +19,71 @@ export function addDays(str, n) {
   return d.toISOString().slice(0, 10);
 }
 
+// ── Plantillas: reemplazo de variables {{...}} ──
+// Centraliza el llenado de plantillas (WhatsApp y futuros canales).
+// `target` = lead / cita / venta. `ctx` = { asesor, cargo, filial, ... }.
+// Soporta alias en español para que el usuario use el nombre natural de la variable.
+export function buildMessage(tmpl, target = {}, ctx = {}) {
+  const nombreCompleto = `${target.nombre || ''} ${target.apellido || ''}`.trim();
+  const map = {
+    // Cliente
+    nombre:    nombreCompleto,
+    cliente:   nombreCompleto,
+    apellido:  target.apellido || '',
+    telefono:  target.telefono || '',
+    email:     target.email || '',
+    correo:    target.email || '',
+    empresa:   target.empresa || '',
+    ciudad:    target.ciudad || '',
+    // Cita
+    fecha:     formatDate(target.fecha),
+    hora:      target.hora || '',
+    zoom:      target.zoomLink || 'sin link',
+    // Comercial — plan/producto/interés son sinónimos
+    plan:      target.plan || target.interes || '',
+    producto:  target.interes || target.plan || '',
+    interes:   target.interes || target.plan || '',
+    // Asesor (alias: ejecutivo)
+    asesor:    ctx.asesor || '',
+    ejecutivo: ctx.asesor || '',
+    cargo:     ctx.cargo || '',
+    filial:    ctx.filial || ''
+  };
+  return String(tmpl || '')
+    .replace(/\{\{\s*(\w+)\s*\}\}/g, (full, key) => {
+      const k = key.toLowerCase();
+      return Object.prototype.hasOwnProperty.call(map, k) ? map[k] : '';
+    });
+}
+
+// ── Mayúsculas automáticas ──
+// Aplica MAYÚSCULAS a inputs de texto al perder el foco (no a textareas).
+// Excluye correos, URLs y campos técnicos. Configurable por el usuario.
+const _UPPER_SKIP_TYPES = ['email', 'url', 'password', 'number', 'date', 'time', 'tel', 'search', 'color', 'range', 'file', 'checkbox', 'radio'];
+function _isUpperEligible(el) {
+  if (!el || el.tagName !== 'INPUT') return false;
+  const t = (el.getAttribute('type') || 'text').toLowerCase();
+  if (_UPPER_SKIP_TYPES.includes(t)) return false;
+  if (el.hasAttribute('data-no-upper')) return false;
+  const idn = ((el.id || '') + ' ' + (el.name || '')).toLowerCase();
+  if (/mail|correo|url|link|zoom|http|web|password|clave/.test(idn)) return false;
+  return true;
+}
+let _upperBound = false;
+export function initAutoUpper(enabled) {
+  document.body.classList.toggle('auto-upper', !!enabled);
+  if (_upperBound) return;          // el listener se registra una sola vez
+  _upperBound = true;
+  document.addEventListener('focusout', e => {
+    if (!document.body.classList.contains('auto-upper')) return;
+    const el = e.target;
+    if (!_isUpperEligible(el)) return;
+    if (el.value.includes('@')) return;   // seguridad: parece email
+    const up = el.value.toLocaleUpperCase('es');
+    if (up !== el.value) el.value = up;
+  });
+}
+
 // ── Moneda y formato ──
 export function fmtMoney(n) {
   if (n == null) return '—';

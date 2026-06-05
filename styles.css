@@ -474,3 +474,8 @@ body {
   .tp-dropdown{width:200px;grid-template-columns:repeat(3,1fr);}
   .wi-header,.wi-row{grid-template-columns:90px 45px 55px 85px 85px 85px 70px;font-size:.63rem;}
 }
+
+/* ═══ Mayúsculas automáticas (configurable) — solo feedback visual; el valor se normaliza al perder foco ═══ */
+body.auto-upper input:not([type=email]):not([type=url]):not([type=password]):not([type=number]):not([type=date]):not([type=time]):not([type=tel]):not([type=search]):not([type=color]):not([type=file]):not([type=checkbox]):not([type=radio]):not([data-no-upper]){
+  text-transform:uppercase;
+}
