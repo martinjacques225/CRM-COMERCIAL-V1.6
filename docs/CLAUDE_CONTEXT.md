@@ -11,8 +11,9 @@ Aplicación web progresiva (PWA) orientada a asesores comerciales y equipos de v
 
 ## Estado Actual del Desarrollo
 
-**Versión:** 3.2 (capa de servicios)
-**Fase actual:** ✅ *Fase Servicios* COMPLETADA Y CERRADA — arquitectura desacoplada, limpieza de deuda técnica y separación de archivos. Sincronizada al repositorio Git.
+**Versión:** 3.3 (correcciones funcionales — pulido pre-Supabase)
+**Fase actual:** 🛠️ *Correcciones funcionales* — bugs y comportamientos comerciales, sin tocar la capa de servicios. Cambios en rama `fase-correcciones-funcionales`, **pendientes de prueba en navegador y commit** (ver `CHANGELOG.md` [3.3]). Helpers nuevos: `utils.buildMessage` (variables de plantillas con alias) e `utils.initAutoUpper` (mayúsculas automáticas configurables). Agenda: `deleteAppointment` / `appointmentToLead`.
+**Fase previa:** ✅ *Fase Servicios* COMPLETADA Y CERRADA — arquitectura desacoplada, limpieza de deuda técnica y separación de archivos. Sincronizada al repositorio Git.
 **Fases previas:** Auditoría técnica (✅) · Diseño de arquitectura multiusuario/Supabase (✅, ver `ARQUITECTURA_FASE2.md`).
 **Pendiente explícito:** NO se ha implementado Supabase ni multiusuario todavía. Sólo se preparó la base.
 **Verificación de la fase:** estática OK (sintaxis + 186 imports resueltos + cero acceso directo a IndexedDB desde la UI). Falta prueba funcional en navegador por el usuario.
@@ -140,11 +141,17 @@ Detalle completo y contrato de `window._app`: ver **`docs/SERVICES_CONTRACT.md`*
 
 ## Próximos Pasos
 
-1. **Prueba funcional en navegador** de Leads, Agenda, Ventas, Configuración (humano) — confirmar cero regresiones visibles.
-2. **Fase 7 — Supabase (entorno de pruebas):** crear tablas + Auth + RLS + catálogos según `ARQUITECTURA_FASE2.md`. Implementar el interior de los `*.service.js` con un adapter remoto.
-3. **Fase 8 — Motor de sincronización** offline-first (outbox + Realtime).
+> Punto de arranque para el siguiente hilo. Trabajar en el clon Git, en una rama nueva. Esta fase (v3.2 Servicios) está **cerrada**.
+
+0. **Pendiente del usuario (esta fase):** probar en navegador Leads, Agenda, Ventas y Configuración, y hacer Commit + Push del cambio v3.2 ya preparado en el clon.
+1. **Recomendado antes de Supabase (limpieza de bajo riesgo, rama propia):** adoptar **UUID + `organizacion_id`** en el modelo local, y externalizar `lead.historial[]` a un concepto de `actividad`. Hace la migración futura casi trivial.
+2. **Fase 7 — Supabase (entorno de pruebas):** crear tablas + Auth + RLS + catálogos según `ARQUITECTURA_FASE2.md`. Implementar el interior de los `*.service.js` con un adapter remoto (la UI no se toca).
+3. **Fase 8 — Motor de sincronización** offline-first (outbox + Realtime) — el componente más complejo.
 4. **Fase 9 — Migración asistida** IndexedDB → Supabase (no destructiva, con dry-run) y piloto 1 filial.
-5. Adoptar **UUID + `organizacion_id`** en el modelo antes de multiusuario.
+
+### Otros frentes posibles para el siguiente hilo (no dependen de Supabase)
+- Módulos nuevos del backlog (ROADMAP Fase 5): Tareas, Prospección, Actividad/timeline, Embudo Kanban ampliado, Reportes PDF/Excel, Recordatorios in-app.
+- Deuda menor: paginación en lecturas (`getAll`), unificar íconos SVG, migrar `window._app` a imports.
 
 ---
 

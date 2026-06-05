@@ -141,6 +141,58 @@ export async function openFormModalFromLead(leadId) {
   document.getElementById('modalCancel').onclick = closeModal;
 }
 
+// ── Eliminar cita ──
+export async function deleteAppointment(id) {
+  const appt = await appointments.get(id); if (!appt) return;
+  if (!confirm('¿Eliminar esta cita? Esta acción no se puede deshacer.')) return;
+  // Si la cita provino de un lead, lo dejamos disponible de nuevo (con historial)
+  if (appt.leadId) {
+    const lead = await leads.get(appt.leadId);
+    if (lead) {
+      lead.agendado = false;
+      if (lead.estado === 'Cita agendada' || lead.estado === 'Confirmado') lead.estado = 'Seguimiento';
+      await leads.update(lead);
+      await leads.addHistorial(lead.id, { tipo: 'cita_eliminada', desc: `Cita del ${formatDate(appt.fecha)} a las ${appt.hora} eliminada` });
+    }
+  }
+  await appointments.delete(id);
+  toast('Cita eliminada');
+  window._app?.refreshView?.();
+}
+
+// ── Devolver cita a Leads (recuperar lead desde la agenda) ──
+export async function appointmentToLead(id) {
+  const appt = await appointments.get(id); if (!appt) return;
+  if (!confirm('¿Devolver esta cita a Leads? Se quitará de la agenda.')) return;
+  let leadId = appt.leadId;
+  if (leadId) {
+    const lead = await leads.get(leadId);
+    if (lead) {
+      lead.agendado = false;
+      lead.estado   = 'Seguimiento';
+      await leads.update(lead);
+      await leads.addHistorial(leadId, { tipo: 'devuelto_a_leads', desc: `Cita del ${formatDate(appt.fecha)} a las ${appt.hora} devuelta a Leads` });
+    } else {
+      leadId = null; // el lead asociado ya no existe → se crea uno nuevo
+    }
+  }
+  if (!leadId) {
+    leadId = await leads.add({
+      nombre:        appt.nombre || '',
+      telefono:      appt.telefono || '',
+      interes:       appt.interes || '',
+      origen:        appt.origenLead || '',
+      estado:        'Seguimiento',
+      agendado:      false,
+      observaciones: appt.observaciones || ''
+    });
+    await leads.addHistorial(leadId, { tipo: 'recuperado_de_agenda', desc: `Recuperado desde la agenda (cita del ${formatDate(appt.fecha)} a las ${appt.hora})` });
+  }
+  await appointments.delete(id);
+  toast('Cita devuelta a Leads ✅', 'success');
+  window._app?.navigate?.('leads');
+}
+
 // ── Reagendar ──
 export async function openReagendarModal(id) {
   const appt = await appointments.get(id); if (!appt) return;

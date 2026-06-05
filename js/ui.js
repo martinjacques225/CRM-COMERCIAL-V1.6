@@ -133,6 +133,8 @@ export function attachCardEvents() {
       else if (action==='edit-lead')    app?.openLeadModal?.(numId);
       else if (action==='agendar-lead') app?.openFormModalFromLead?.(numId);
       else if (action==='reagendar')    app?.openReagendarModal?.(numId);
+      else if (action==='delete-appt')  app?.deleteAppointment?.(numId);
+      else if (action==='appt-to-lead') app?.appointmentToLead?.(numId);
       else if (action==='delete-sale')  app?.deleteSale?.(numId);
       else if (action==='delete-lead')  app?.deleteLead?.(numId);
     });

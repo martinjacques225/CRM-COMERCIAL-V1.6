@@ -5,7 +5,7 @@ import { escHtml, toast } from '../../js/utils.js';
 export async function render() {
   const center = document.getElementById('center');
   const tmpls  = await templates.getAll();
-  const vars   = ['{{nombre}}','{{telefono}}','{{fecha}}','{{hora}}','{{producto}}','{{zoom}}','{{ejecutivo}}'];
+  const vars   = ['{{nombre}}','{{telefono}}','{{email}}','{{empresa}}','{{fecha}}','{{hora}}','{{plan}}','{{producto}}','{{zoom}}','{{asesor}}','{{cargo}}','{{filial}}'];
   center.innerHTML = `<div class="view-animate"><div class="templates-grid">
     ${tmpls.map(t => `
       <div class="template-card">
