@@ -16,5 +16,8 @@ export const S = {
   showAgendados:  false,
   calcPlan:       'contado',
   calcQty:        1,
-  calcBeca:       false
+  calcBeca:       false,
+  calcTab:        'rapida',   // 'rapida' | 'simulador'
+  simDebut:       false,      // bono debut activo en la simulación
+  simGrid:        null        // grilla de ventas por semana (lazy init en el módulo)
 };

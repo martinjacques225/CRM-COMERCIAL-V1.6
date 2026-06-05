@@ -1,5 +1,6 @@
 // modules/agenda/agenda.js
 import { appointments } from '../../services/appointment.service.js';
+import { leads } from '../../services/lead.service.js';
 import { S } from '../../js/state.js';
 import { todayStr, nowTimeStr, formatDate, escHtml, statusBadgeClass } from '../../js/utils.js';
 
@@ -16,58 +17,133 @@ const _ico = {
   money:    `<svg viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/></svg>`,
   plus:     `<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>`,
   trash:    `<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>`,
-  undo:     `<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.707 3.293a1 1 0 010 1.414L5.414 7H11a5 5 0 010 10h-1a1 1 0 110-2h1a3 3 0 100-6H5.414l2.293 2.293a1 1 0 11-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>`
+  undo:     `<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.707 3.293a1 1 0 010 1.414L5.414 7H11a5 5 0 010 10h-1a1 1 0 110-2h1a3 3 0 100-6H5.414l2.293 2.293a1 1 0 11-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>`,
+  dots:     `<svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 6a1.6 1.6 0 100-3.2A1.6 1.6 0 0010 6zm0 5.6a1.6 1.6 0 100-3.2 1.6 1.6 0 000 3.2zm0 5.6a1.6 1.6 0 100-3.2 1.6 1.6 0 000 3.2z"/></svg>`
 };
 
 export async function render() {
-  const center = document.getElementById('center');
-  const appts  = await appointments.getByDate(S.date);
+  const center  = document.getElementById('center');
+  const appts   = await appointments.getByDate(S.date);
   appts.sort((a, b) => a.hora.localeCompare(b.hora));
-  const byHour = {};
-  appts.forEach(a => { const h = a.hora.split(':')[0]; if (!byHour[h]) byHour[h] = []; byHour[h].push(a); });
-  const now = new Date(), isToday = S.date === todayStr();
-  const hours = []; for (let h = 6; h <= 22; h++) hours.push(h);
+  const isToday = S.date === todayStr();
+  const nowStr  = nowTimeStr();
 
-  center.innerHTML = `<div class="time-grid view-animate">
-    ${hours.map(h => {
-      const hStr = h.toString().padStart(2, '0'), cards = byHour[hStr] || [];
-      const showNow = isToday && h === now.getHours();
-      return `<div class="time-slot">
-        <div class="time-label">${hStr}:00</div>
-        <div class="time-line">
-          ${showNow ? `<div class="time-now-line" style="top:${Math.round(now.getMinutes()/60*100)}%"></div>` : ''}
-          <div class="time-cards">${cards.map(a => _buildCard(a)).join('')}</div>
-        </div>
-      </div>`;
-    }).join('')}
-  </div>
-  ${appts.length === 0
-    ? `<div class="empty-day" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">${_ico.calendar}<h3>Sin citas este día</h3><p>Haz clic en "Nueva cita" para agregar una.</p></div>`
-    : ''}`;
+  const top = await _buildTop(appts, isToday, nowStr);
+
+  let listHtml;
+  if (appts.length === 0) {
+    listHtml = `<div class="empty-day">${_ico.calendar}<h3>Sin citas este día</h3><p>Usa "Nueva cita", o revisa tus pendientes arriba.</p></div>`;
+  } else {
+    let nowDone = !isToday;
+    listHtml = `<div class="apt-list">${appts.map(a => {
+      let marker = '';
+      if (!nowDone && a.hora >= nowStr) { marker = `<div class="apt-now"><span>Ahora · ${nowStr}</span></div>`; nowDone = true; }
+      return marker + _buildCard(a);
+    }).join('')}${!nowDone ? `<div class="apt-now"><span>Ahora · ${nowStr}</span></div>` : ''}</div>`;
+  }
+
+  center.innerHTML = `<div class="view-animate">${top}${listHtml}</div>`;
   center.style.position = 'relative';
   window._app?.attachCardEvents?.();
+  document.querySelectorAll('[data-goleads]').forEach(el =>
+    el.addEventListener('click', () => window._app?.navigate?.('leads')));
+  _wireMenus();
+}
+
+// Menú "⋯" de acciones secundarias por tarjeta.
+let _menuCloseBound = false;
+function _wireMenus() {
+  document.querySelectorAll('.apt-menu-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const menu = btn.closest('.apt-menu');
+      const isOpen = menu.classList.contains('open');
+      document.querySelectorAll('.apt-menu.open').forEach(m => m.classList.remove('open'));
+      if (!isOpen) menu.classList.add('open');
+    });
+  });
+  // Cerrar el menú al elegir una acción (el data-action lo maneja attachCardEvents aparte).
+  document.querySelectorAll('.apt-menu-item').forEach(it =>
+    it.addEventListener('click', () => it.closest('.apt-menu')?.classList.remove('open')));
+  // Cerrar al hacer clic fuera (listener global, una sola vez).
+  if (!_menuCloseBound) {
+    _menuCloseBound = true;
+    document.addEventListener('click', () =>
+      document.querySelectorAll('.apt-menu.open').forEach(m => m.classList.remove('open')));
+  }
+}
+
+// Bloque superior: próxima cita destacada + pendientes (lo que llena el espacio liberado).
+async function _buildTop(appts, isToday, nowStr) {
+  const next = appts.find(a => a.hora >= nowStr && a.estado === 'Pendiente')
+            || (!isToday ? appts.find(a => a.estado === 'Pendiente') : null);
+
+  let hero = '';
+  if (next) {
+    const cd = isToday ? _countdown(nowStr, next.hora) : '';
+    hero = `<div class="next-hero">
+      <div class="next-hero-time">${next.hora}</div>
+      <div class="next-hero-body">
+        <div class="next-hero-title">Próxima · ${escHtml(next.nombre)}</div>
+        <div class="next-hero-sub">${escHtml(next.interes || 'Sin interés definido')}${cd ? ` · ${cd}` : ''}</div>
+      </div>
+      ${next.telefono ? `<button class="btn-action hero-wa" data-action="wa" data-id="${next.id}" data-type="appt" aria-label="WhatsApp">${_ico.whatsapp}</button>` : ''}
+    </div>`;
+  }
+
+  let pend = '';
+  try {
+    const all = await leads.getAll();
+    const sinContacto = all.filter(l => l.estado === 'Nuevo' || l.estado === 'Intento de contacto').length;
+    const seguimiento = all.filter(l => l.estado === 'Seguimiento').length;
+    const propuestas  = all.filter(l => l.estado === 'Propuesta enviada').length;
+    const chips = [];
+    if (sinContacto) chips.push(`<button class="pend-chip" data-goleads><span class="pend-n">${sinContacto}</span> sin contactar</button>`);
+    if (seguimiento) chips.push(`<button class="pend-chip" data-goleads><span class="pend-n">${seguimiento}</span> seguimiento${seguimiento !== 1 ? 's' : ''}</button>`);
+    if (propuestas)  chips.push(`<button class="pend-chip" data-goleads><span class="pend-n">${propuestas}</span> propuesta${propuestas !== 1 ? 's' : ''}</button>`);
+    if (chips.length) pend = `<div class="pend-strip"><span class="pend-label">Pendientes</span>${chips.join('')}</div>`;
+  } catch {}
+
+  return (hero || pend) ? `<div class="agenda-top">${hero}${pend}</div>` : '';
+}
+
+function _countdown(nowStr, horaStr) {
+  const [nh, nm] = nowStr.split(':').map(Number);
+  const [hh, hm] = horaStr.split(':').map(Number);
+  const diff = (hh * 60 + hm) - (nh * 60 + nm);
+  if (diff <= 0) return 'ahora';
+  if (diff < 60) return `en ${diff} min`;
+  const h = Math.floor(diff / 60), m = diff % 60;
+  return `en ${h}h${m ? ` ${m}m` : ''}`;
 }
 
 function _buildCard(a) {
   return `<div class="apt-card" data-estado="${escHtml(a.estado)}" data-id="${a.id}">
-    <div class="apt-card-header">
-      <span class="apt-card-time">${a.hora}</span>
-      <span class="apt-card-name">${escHtml(a.nombre)}</span>
-      <span class="apt-card-status"><span class="${statusBadgeClass(a.estado)}">${escHtml(a.estado)}</span></span>
-    </div>
-    <div class="apt-card-meta">
-      ${a.interes    ? `<span class="apt-meta-item">${_ico.chart}${escHtml(a.interes)}</span>`    : ''}
-      ${a.telefono   ? `<span class="apt-meta-item">${_ico.phone}${escHtml(a.telefono)}</span>`   : ''}
-      ${a.origenLead ? `<span class="apt-meta-item">${_ico.list}${escHtml(a.origenLead)}</span>`  : ''}
-    </div>
-    <div class="apt-card-actions">
-      ${a.telefono ? `<button class="btn-action green" data-action="call"     data-id="${a.id}" data-tel="${escHtml(a.telefono)}" data-nombre="${escHtml(a.nombre)}">${_ico.phone}Llamar</button>` : ''}
-      ${a.telefono ? `<button class="btn-action green" data-action="wa"       data-id="${a.id}" data-type="appt">${_ico.whatsapp}WhatsApp</button>` : ''}
-      ${a.zoomLink ? `<button class="btn-action blue"  data-action="zoom"     data-id="${a.id}" data-zoom="${escHtml(a.zoomLink)}">${_ico.zoom}Zoom</button>` : ''}
-      <button class="btn-action primary" data-action="edit"     data-id="${a.id}">${_ico.edit}Editar</button>
-      <button class="btn-action"         data-action="reagendar" data-id="${a.id}">${_ico.reschedule}Reagendar</button>
-      <button class="btn-action"         data-action="appt-to-lead" data-id="${a.id}">${_ico.undo}A Leads</button>
-      <button class="btn-action danger"  data-action="delete-appt"  data-id="${a.id}">${_ico.trash}Eliminar</button>
+    <div class="apt-time-chip">${a.hora}</div>
+    <div class="apt-body">
+      <div class="apt-card-header">
+        <span class="apt-card-name">${escHtml(a.nombre)}</span>
+        <span class="apt-card-status"><span class="${statusBadgeClass(a.estado)}">${escHtml(a.estado)}</span></span>
+      </div>
+      <div class="apt-card-meta">
+        ${a.interes    ? `<span class="apt-meta-item">${_ico.chart}${escHtml(a.interes)}</span>`    : ''}
+        ${a.telefono   ? `<span class="apt-meta-item">${_ico.phone}${escHtml(a.telefono)}</span>`   : ''}
+        ${a.origenLead ? `<span class="apt-meta-item">${_ico.list}${escHtml(a.origenLead)}</span>`  : ''}
+      </div>
+      <div class="apt-card-actions">
+        ${a.telefono ? `<button class="btn-action green" data-action="call"     data-id="${a.id}" data-tel="${escHtml(a.telefono)}" data-nombre="${escHtml(a.nombre)}">${_ico.phone}Llamar</button>` : ''}
+        ${a.telefono ? `<button class="btn-action green" data-action="wa"       data-id="${a.id}" data-type="appt">${_ico.whatsapp}WhatsApp</button>` : ''}
+        ${a.zoomLink ? `<button class="btn-action blue"  data-action="zoom"     data-id="${a.id}" data-zoom="${escHtml(a.zoomLink)}">${_ico.zoom}Zoom</button>` : ''}
+        <button class="btn-action primary" data-action="edit"     data-id="${a.id}">${_ico.edit}Editar</button>
+        <div class="apt-menu">
+          <button class="btn-action apt-menu-btn" aria-label="Más acciones">${_ico.dots}</button>
+          <div class="apt-menu-list">
+            <button class="apt-menu-item"        data-action="reagendar"    data-id="${a.id}">${_ico.reschedule}Reagendar</button>
+            <button class="apt-menu-item"        data-action="appt-to-lead" data-id="${a.id}">${_ico.undo}A Leads</button>
+            <button class="apt-menu-item danger" data-action="delete-appt"  data-id="${a.id}">${_ico.trash}Eliminar</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>`;
 }
@@ -77,8 +153,6 @@ export async function renderPanel() {
   if (S.view !== 'agenda') { panel.innerHTML = ''; return; }
   const appts  = await appointments.getByDate(S.date);
   appts.sort((a, b) => a.hora.localeCompare(b.hora));
-  const nowStr = nowTimeStr();
-  const next   = appts.find(a => a.hora >= nowStr && a.estado === 'Pendiente');
   const total  = appts.length;
   const asistio  = appts.filter(a => a.estado === 'Asistió').length;
   const noAsis   = appts.filter(a => a.estado === 'No asistió').length;
@@ -88,12 +162,6 @@ export async function renderPanel() {
   const maxO     = Math.max(...Object.values(origenMap), 1);
 
   panel.innerHTML = `
-    ${next ? `<div class="panel-next">
-      <div class="panel-card-title">Próxima cita</div>
-      <div class="panel-next-name">${escHtml(next.nombre)}</div>
-      <div class="panel-next-time">${next.hora}</div>
-      <div class="panel-next-interest">${escHtml(next.interes||'-')}</div>
-    </div>` : ''}
     <div class="panel-card">
       <div class="panel-card-title">Resumen del día</div>
       <div class="panel-stat"><span class="panel-stat-label">Total citas</span><span class="panel-stat-val">${total}</span></div>

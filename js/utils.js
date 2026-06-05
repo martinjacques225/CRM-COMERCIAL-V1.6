@@ -1,4 +1,5 @@
 // js/utils.js — Utilidades puras, motor de comisiones y helpers de UI
+import { PLANES } from './planes.js';
 
 // ── Fechas ──
 export function todayStr()     { return new Date().toISOString().slice(0, 10); }
@@ -150,6 +151,9 @@ export function getWeekStart(dateStr) {
   return mon.toISOString().slice(0, 10);
 }
 export function isContadoPlan(planId) {
+  // Data-driven: usa la bandera esContado del catálogo; fallback compatible con datos antiguos.
+  const p = PLANES.find(x => x.id === planId);
+  if (p) return !!p.esContado;
   return planId === 'contado' || planId === 'convenio_contado';
 }
 export function groupByWeek(salesArr) {
@@ -202,6 +206,37 @@ export function calcMonthComision(allSales, year, month, debutActivo = false, PL
   const debut        = debutActivo ? 20000 : 0;
   const total        = comisiones + incentivos + bpi + conectividad + debut;
   return { comisiones, incentivos, bpi, conectividad, debut, total, thisMo, weekDetails };
+}
+
+// Proyección "what-if": calcula el sueldo mensual a partir de una grilla
+// de ventas planificadas por semana (no toca datos reales). Reusa el mismo
+// motor de bonos semanales (calcIncentiveSemanal) y BPI mensual (calcBPI)
+// que rige las ventas reales, por lo que la simulación es consistente.
+// weekGrid: Array<Record<planId, cantidad>>
+export function calcProjection(weekGrid, PLANES = [], debutActivo = false) {
+  const comByPlan = id => (PLANES.find(p => p.id === id)?.comision || 0);
+  let comisiones = 0, incentivos = 0, totalVentas = 0;
+  const weeks = (weekGrid || []).map(week => {
+    const sales = [];
+    let comSemana = 0;
+    Object.entries(week || {}).forEach(([planId, qty]) => {
+      const n = Math.max(0, parseInt(qty) || 0);
+      comSemana += comByPlan(planId) * n;
+      for (let i = 0; i < n; i++) sales.push({ plan: planId });
+    });
+    const inc = calcIncentiveSemanal(sales);
+    comisiones  += comSemana;
+    incentivos  += inc.bono;
+    totalVentas += sales.length;
+    return { comSemana, ventas: sales.length, contados: inc.contados,
+             noContados: sales.length - inc.contados, bono: inc.bono, bC: inc.bC, bG: inc.bG };
+  });
+  const bpiRate      = totalVentas >= 13 ? 23000 : totalVentas >= 10 ? 21000 : totalVentas >= 6 ? 20000 : 0;
+  const bpi          = calcBPI(totalVentas);
+  const conectividad = 40000;
+  const debut        = debutActivo ? 20000 : 0;
+  const total        = comisiones + incentivos + bpi + conectividad + debut;
+  return { weeks, comisiones, incentivos, bpi, bpiRate, conectividad, debut, total, totalVentas };
 }
 
 // ── Time Picker (UI helper, sin dependencia de módulo) ──

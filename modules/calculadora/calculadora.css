@@ -66,3 +66,70 @@
 }
 .calc-btn-add:hover { background: var(--primary); color: white; }
 
+/* ═══ SUB-PESTAÑAS ═══ */
+.calc-tabs { display: flex; gap: 4px; margin-bottom: 18px; background: var(--surface2); padding: 4px; border-radius: var(--radius); width: fit-content; }
+.calc-tab {
+  border: none; background: transparent; color: var(--text2);
+  font-family: var(--font); font-size: .82rem; font-weight: 600;
+  padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; transition: all var(--transition);
+}
+.calc-tab:hover { color: var(--text); }
+.calc-tab.active { background: var(--surface); color: var(--primary); box-shadow: var(--shadow-sm); }
+
+/* ═══ SIMULADOR MENSUAL ═══ */
+.sim-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.sim-sub { font-size: .76rem; color: var(--text2); max-width: 540px; line-height: 1.45; }
+.sim-reset {
+  flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text2);
+  font-family: var(--font); font-size: .74rem; font-weight: 600; padding: 7px 13px;
+  border-radius: var(--radius-sm); cursor: pointer; transition: all var(--transition);
+}
+.sim-reset:hover { border-color: var(--danger); color: var(--danger); }
+
+.sim-grid2 { display: grid; grid-template-columns: 1fr 330px; gap: 20px; align-items: start; }
+
+.sim-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+.sim-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.sim-table th, .sim-table td { padding: 7px 8px; text-align: center; border-bottom: 1px solid var(--border-soft); }
+.sim-table thead th { font-size: .68rem; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .04em; background: var(--surface2); position: sticky; top: 0; }
+.sim-th-plan { text-align: left !important; }
+.sim-th-total, .sim-td-rowtotal { background: var(--surface2); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text); }
+.sim-td-plan { text-align: left !important; white-space: nowrap; }
+.sim-plan-dot { display: inline-block; width: 8px; height: 8px; border-radius: 99px; margin-right: 6px; vertical-align: middle; }
+.sim-plan-name { font-weight: 600; color: var(--text); }
+.sim-plan-com { display: inline-block; margin-left: 8px; font-size: .7rem; color: var(--success); font-weight: 700; font-variant-numeric: tabular-nums; }
+.sim-tag { font-size: .58rem; font-weight: 700; text-transform: uppercase; padding: 1px 5px; border-radius: 99px; background: var(--success-bg); color: var(--success); letter-spacing: .04em; }
+.sim-input {
+  width: 46px; padding: 6px 4px; border: 1px solid var(--border); border-radius: var(--radius-xs);
+  background: var(--surface2); color: var(--text); font-family: var(--font); font-size: .85rem;
+  font-weight: 600; text-align: center; outline: none; transition: border-color var(--transition);
+}
+.sim-input:focus { border-color: var(--primary); background: var(--surface); }
+.sim-table tfoot td { background: var(--surface2); border-bottom: none; }
+.sim-foot-n { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text); }
+
+.sim-chart { display: flex; align-items: flex-end; gap: 10px; height: 120px; margin-top: 16px; padding: 0 4px; }
+.sim-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
+.sim-bar-stack { width: 60%; max-width: 38px; flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; }
+.sim-bar { width: 100%; border-radius: var(--radius-xs) var(--radius-xs) 0 0; transition: height var(--spring); min-height: 0; }
+.sim-bar-com { background: var(--primary); }
+.sim-bar-bono { background: var(--success); border-radius: var(--radius-xs); }
+.sim-bar-label { font-size: .68rem; color: var(--text3); margin-top: 5px; font-weight: 600; }
+.sim-legend { display: flex; gap: 16px; justify-content: center; margin-top: 8px; font-size: .72rem; color: var(--text2); }
+.sim-dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+
+.sim-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
+.sim-kpi { background: var(--surface2); border: 1px solid var(--border-soft); border-radius: var(--radius-sm); padding: 10px 12px; }
+.sim-kpi-label { font-size: .66rem; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px; }
+.sim-kpi-val { font-size: 1.02rem; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
+.sim-kpi-val.green { color: var(--success); }
+.sim-kpi-val.amber { color: var(--warning); }
+.sim-note { margin-top: 12px; padding: 10px 12px; background: var(--primary-light); border-radius: var(--radius-sm); font-size: .76rem; color: var(--text2); line-height: 1.45; }
+
+@media (max-width: 760px) {
+  .calc-grid, .sim-grid2 { grid-template-columns: 1fr; }
+  .calc-sidebar { position: static; }
+  .sim-head { flex-direction: column; }
+  .sim-input { width: 42px; }
+}
+

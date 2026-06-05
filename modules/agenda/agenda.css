@@ -50,14 +50,59 @@
 .empty-day h3 { font-size: .96rem; font-weight: 600; color: var(--text2); }
 .empty-day p { font-size: .78rem; }
 
+/* ═══ AGENDA — BLOQUE SUPERIOR (próxima cita + pendientes) ═══ */
+.agenda-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.next-hero {
+  display: flex; align-items: center; gap: 14px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff; border-radius: var(--radius); padding: 12px 16px;
+}
+.next-hero-time { font-size: 1.7rem; font-weight: 800; font-variant-numeric: tabular-nums; font-family: var(--mono); line-height: 1; }
+.next-hero-body { flex: 1; min-width: 0; }
+.next-hero-title { font-size: .95rem; font-weight: 700; }
+.next-hero-sub { font-size: .76rem; opacity: .85; margin-top: 3px; }
+.next-hero .hero-wa {
+  flex-shrink: 0; background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.3);
+  color: #fff; padding: 7px;
+}
+.next-hero .hero-wa:hover { background: rgba(255,255,255,.28); }
+.next-hero .hero-wa svg { width: 16px; height: 16px; }
+
+.pend-strip { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pend-label { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); }
+.pend-chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
+  border: 1px solid var(--border); background: var(--surface); border-radius: 99px;
+  font-size: .76rem; color: var(--text2); cursor: pointer; font-family: var(--font);
+  transition: all var(--transition); -webkit-tap-highlight-color: transparent;
+}
+.pend-chip:hover { border-color: var(--primary); color: var(--primary); }
+.pend-n { font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; }
+
+/* ═══ AGENDA — LISTA COMPACTA ═══ */
+.apt-list { display: flex; flex-direction: column; gap: 8px; }
+.apt-now {
+  display: flex; align-items: center; gap: 8px;
+  font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--danger); margin: 2px 0;
+}
+.apt-now::after { content: ''; flex: 1; height: 1px; background: var(--danger); opacity: .35; }
+
 /* ═══ APPOINTMENT CARDS ═══ */
 .apt-card {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); padding: 10px 12px;
+  border-radius: var(--radius-sm); padding: 11px 13px;
   cursor: pointer; transition: all var(--transition);
   border-left: 3px solid var(--border);
+  display: flex; gap: 13px; align-items: flex-start;
 }
 .apt-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+.apt-time-chip {
+  font-size: 1.3rem; font-weight: 800; color: var(--text);
+  font-variant-numeric: tabular-nums; font-family: var(--mono);
+  min-width: 56px; line-height: 1.35;
+}
+.apt-body { flex: 1; min-width: 0; }
 .apt-card[data-estado="Pendiente"]     { border-left-color: var(--s-pendiente); }
 .apt-card[data-estado="Asistió"]       { border-left-color: var(--s-asistio); }
 .apt-card[data-estado="No asistió"]    { border-left-color: var(--s-noasistio); }
@@ -90,4 +135,27 @@
 .btn-action.primary:hover { background: var(--primary-dark); }
 .btn-action.danger { border-color:#FCA5A5; background: var(--danger-bg); color: var(--danger); }
 .btn-action svg { width: 11px; height: 11px; }
+
+/* ═══ MENÚ "⋯" DE ACCIONES SECUNDARIAS ═══ */
+.apt-menu { position: relative; display: inline-block; }
+.apt-menu-btn { padding: 4px 7px; }
+.apt-menu-btn svg { width: 14px; height: 14px; }
+.apt-menu-list {
+  position: absolute; right: 0; top: calc(100% + 4px); z-index: 30;
+  min-width: 156px; padding: 4px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); box-shadow: var(--shadow);
+  display: none; flex-direction: column; gap: 2px;
+}
+.apt-menu.open .apt-menu-list { display: flex; }
+.apt-menu-item {
+  display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
+  padding: 8px 10px; border: none; background: transparent; color: var(--text);
+  font-family: var(--font); font-size: .8rem; font-weight: 500; cursor: pointer;
+  border-radius: var(--radius-xs); transition: background var(--transition);
+}
+.apt-menu-item:hover { background: var(--surface2); }
+.apt-menu-item.danger { color: var(--danger); }
+.apt-menu-item.danger:hover { background: var(--danger-bg); }
+.apt-menu-item svg { width: 14px; height: 14px; flex-shrink: 0; }
 

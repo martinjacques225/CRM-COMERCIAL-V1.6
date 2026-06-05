@@ -18,14 +18,23 @@
   - `deleteAppointment(id)`: elimina la cita; si provenía de un lead, lo libera (`agendado=false`, estado→Seguimiento) y registra historial.
   - `appointmentToLead(id)`: devuelve la cita a Leads. Si tenía lead asociado lo recupera; si no, crea un nuevo lead desde los datos de la cita. Registra historial y elimina la cita.
   - Botones "A Leads" y "Eliminar" en cada tarjeta de cita.
+- **Planes del Anexo LGS al catálogo global** (`js/planes.js`): `una_persona` (Plan 1 Persona, $52.000, contado) y `plan_3x1` (Plan 3X1, $40.000, crédito). Valores de "Gestión por Participante". Aparecen en Calculadora, Ventas y Dashboard. Aditivo, sin romper datos.
+- **Calculadora — Simulador mensual** (nueva sub-pestaña, se mantiene el "Cálculo rápido"): grilla de ventas proyectadas por plan × semana (5 semanas) → comisiones + bonos semanales + BPI (escala 6/10/13) + fijos (conectividad/debut) + sueldo total. Mini-gráfico comisión/bono por semana y desglose. Proyección "what-if": no toca datos reales; se persiste en `localStorage` (`crm_sim_grid_v1`).
+- **`utils.calcProjection(weekGrid, PLANES, debutActivo)`** — motor de proyección mensual, expuesto vía `services/commission.service.js`. Reusa `calcIncentiveSemanal` y `calcBPI` (consistente con ventas reales).
+- **`utils.isContadoPlan`** ahora es data-driven (bandera `esContado` del catálogo) en lugar de ids hardcodeados; mantiene compatibilidad con datos antiguos.
+
+### Mejorado
+- **Agenda — legibilidad y densidad**: la vista pasó de una cuadrícula fija de 06:00–22:00 (17 filas, ~900px aunque hubiera 2 citas) a una **lista compacta** que muestra solo las citas del día, con la **hora en grande y en color oscuro** (antes ~11px gris). Marcador "Ahora · HH:MM" intercalado.
+- **Agenda — bloque superior**: se agregó arriba del centro una **próxima cita destacada** (hora grande + cuenta regresiva "en N min", visible también en móvil donde no hay panel) y una **franja de pendientes** (leads sin contactar, seguimientos, propuestas) que enlaza a Leads. Se eliminó la "próxima cita" duplicada del panel derecho.
+- **Agenda — acciones compactas**: las tarjetas pasaron de 7 botones a 4 visibles (Llamar, WhatsApp, Zoom, Editar) + un menú **"⋯"** que agrupa los secundarios (Reagendar, A Leads, Eliminar). Menú con cierre al hacer clic fuera.
 
 ### Regla de negocio
 - Al eliminar/devolver una cita ligada a un lead, el lead vuelve a estado **Seguimiento** y queda disponible para re-agendar. Toda acción queda en el historial del lead (`cita_eliminada`, `devuelto_a_leads`, `recuperado_de_agenda`).
 
 ### Archivos modificados
-- `js/utils.js`, `js/ui.js`, `app.js`
-- `modules/calculadora/calculadora.js`, `modules/modals/modal-wa.js`, `modules/modals/modal-cita.js`, `modules/modals/modals.js`
-- `modules/plantillas-wa/whatsapp.js`, `modules/configuracion/configuracion.js`, `modules/agenda/agenda.js`, `styles.css`
+- `js/utils.js`, `js/ui.js`, `app.js`, `js/planes.js`, `js/state.js`, `services/commission.service.js`
+- `modules/calculadora/calculadora.js`, `modules/calculadora/calculadora.css`, `modules/modals/modal-wa.js`, `modules/modals/modal-cita.js`, `modules/modals/modals.js`
+- `modules/plantillas-wa/whatsapp.js`, `modules/configuracion/configuracion.js`, `modules/agenda/agenda.js`, `modules/agenda/agenda.css`, `styles.css`, `docs/BUSINESS_RULES.md`
 
 ### Verificación
 - Inspección de código y pruebas de lógica aisladas (`buildMessage`). **Pendiente: prueba funcional en navegador** (PC + móvil + PWA) antes de commit/push.
