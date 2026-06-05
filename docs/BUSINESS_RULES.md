@@ -34,9 +34,13 @@
    - Plan Contado Convenio: comisión $60.000
    - Plan Crédito Convenio: comisión $33.000
    - Plan Módulo: comisión $33.000
+   - Plan 1 Persona: comisión $52.000, pago único $715.000 (contado)
+   - Plan 3X1: comisión $40.000, matrícula $190.000 + 13 cuotas de $138.000 (3 personas)
    - Plan Excepcional: comisión variable (extraoficial), solo retención extrema
 
-2. **Planes contado** — `contado` y `convenio_contado` son los únicos considerados "contado" para cálculo de incentivos semanales.
+   > Valores tomados del Anexo de Capacitación LGS ("Gestión por Participante").
+
+2. **Planes contado** — Determinado por la bandera `esContado` del catálogo (`js/planes.js`), no por id hardcodeado. Hoy son contado: `contado`, `convenio_contado` y `una_persona`. Aplica al cálculo de incentivos semanales.
 
 3. **Beca Familiar** — Disponible en todos los planes excepto `modulo` y `excepcional`. Es un gancho de cierre gratuito.
 
@@ -81,6 +85,13 @@ Se aplica el mayor entre incentivo por contados o incentivo general:
 ```
 Total = Comisiones base + Incentivos semanales + BPI + $40.000 (conectividad) + $20.000 (debut si activo)
 ```
+
+### Simulador mensual (Calculadora → "Simulador mensual")
+- Vista "what-if": el asesor ingresa ventas proyectadas por plan y por semana (5 semanas).
+- No toca datos reales; se persiste en `localStorage` (`crm_sim_grid_v1`).
+- Reusa el mismo motor que las ventas reales: `calcProjection()` compone `calcIncentiveSemanal` (bonos semanales) + `calcBPI` (escala mensual) + fijos.
+- Expone el sueldo mensual proyectado, desglose y mini-gráfico comisión/bono por semana.
+- Contrato: `calcProjection(weekGrid, PLANES, debutActivo)` en `services/commission.service.js`.
 
 ---
 
