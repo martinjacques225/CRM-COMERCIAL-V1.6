@@ -1,6 +1,6 @@
 // modules/leads/leads.js
-import { leads as leadsDB } from '../../js/db.js';
-import { LEAD_ESTADOS } from '../../js/constants.js';
+import { leads as leadsDB } from '../../services/lead.service.js';
+import { LEAD_ESTADOS } from '../../js/estados.js';
 import { S } from '../../js/state.js';
 import { escHtml, formatDate, toast, statusBadgeClass, avatarHtml } from '../../js/utils.js';
 
@@ -102,8 +102,4 @@ function _buildKanban(list) {
     </div>`;
   }).join('')}</div>`;
 }
-
-export async function deleteLead(id) {
-  if (!confirm('¿Eliminar este lead?')) return;
-  await leadsDB.delete(id); toast('Lead eliminado'); render();
-}
+// NOTA: deleteLead vive ahora sólo en modules/modals/modal-lead.js (vía window._app.deleteLead).

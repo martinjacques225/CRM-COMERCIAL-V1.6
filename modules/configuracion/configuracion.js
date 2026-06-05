@@ -1,6 +1,7 @@
 // modules/configuracion/configuracion.js
-import { config } from '../../js/db.js';
-import { MASCOTAS, CARGOS } from '../../js/constants.js';
+import { config } from '../../services/config.service.js';
+import { MASCOTAS } from '../../js/mascotas.js';
+import { CARGOS } from '../../js/estados.js';
 import { escHtml, avatarColor, getInitials, toast, showFileError } from '../../js/utils.js';
 
 export async function render() {

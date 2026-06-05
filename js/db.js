@@ -177,24 +177,49 @@ export const sales = {
 };
 
 const DEFAULT_TEMPLATES = [
-  { id: 'primer_contacto', nombre: 'Primer contacto', contenido: 'Hola {{nombre}} 👋\n\nTe escribo de parte de *[Empresa]*, vi que podrías estar interesado/a en *{{producto}}*.\n\n¿Tienes unos minutos para conversar? 😊' },
-  { id: 'confirmacion', nombre: 'Confirmación de cita', contenido: 'Hola {{nombre}} 👋\n\nTe confirmo tu cita para el *{{fecha}}* a las *{{hora}}*.\n\nTema: {{producto}}\nLink Zoom: {{zoom}}\n\n¡Te espero puntual! 😊' },
-  { id: 'recordatorio', nombre: 'Recordatorio de cita', contenido: 'Hola {{nombre}}! 🔔\n\nTe recuerdo que tienes una reunión *HOY* a las *{{hora}}*.\n\nTema: {{producto}}\nZoom: {{zoom}}\n\n¿Confirmas asistencia?' },
-  { id: 'reagendamiento', nombre: 'Reagendamiento', contenido: 'Hola {{nombre}} 😊\n\nHemos reagendado tu cita para el *{{fecha}}* a las *{{hora}}*.\n\nTema: {{producto}}\nZoom: {{zoom}}\n\n¡Nos vemos!' },
-  { id: 'seguimiento', nombre: 'Seguimiento', contenido: 'Hola {{nombre}}! 😊\n\nQuería hacer un seguimiento sobre tu interés en *{{producto}}*.\n\n¿Pudiste pensar en nuestra propuesta?\n\nQuedo a tu disposición 🙌' },
-  { id: 'post_reunion', nombre: 'Post reunión', contenido: 'Hola {{nombre}} 🙏\n\nFue un placer conversar contigo hoy.\n\nQuedo atento/a a cualquier consulta sobre *{{producto}}*.\n\n¡Hasta pronto!' },
-  { id: 'cierre', nombre: 'Cierre de venta', contenido: 'Hola {{nombre}} 🎉\n\n¡Muchas gracias por tu confianza!\n\nQueda confirmada tu inscripción en *{{producto}}*.\n\nCualquier consulta, aquí estoy 💪' },
-  { id: 'no_asistio', nombre: 'No asistió', contenido: 'Hola {{nombre}} 👋\n\nNotamos que no pudiste asistir a tu cita de hoy.\n\n¿Todo bien? Podemos reagendarla cuando gustes 😊\n\nQuedo pendiente.' },
-  { id: 'recuperacion', nombre: 'Recuperación de prospecto', contenido: 'Hola {{nombre}}! 😊\n\nHace un tiempo conversamos sobre *{{producto}}*.\n\nQuería retomar el contacto, ¿sigues interesado/a?\n\nTenemos condiciones especiales este mes 🔥' }
+  // ── Contacto inicial ──
+  { id: 'primer_contacto',       nombre: '👋 Primer contacto',           contenido: 'Hola {{nombre}} 👋\n\nTe escribo de parte de *{{ejecutivo}}*, vi que podrías estar interesado/a en *{{producto}}*.\n\n¿Tienes unos minutos para conversar esta semana? 😊' },
+  { id: 'llamada_no_contesto',   nombre: '📵 Llamada no contestada',     contenido: 'Hola {{nombre}} 👋\n\nTe llamé hace un momento pero no pudiste contestar.\n\nSoy *{{ejecutivo}}* y quería contarte sobre *{{producto}}*.\n\n¿Cuándo te queda bien hablar? 📞' },
+  { id: 'intento_contacto',      nombre: '🔁 Segundo intento',           contenido: 'Hola {{nombre}}! 😊\n\nSoy *{{ejecutivo}}*, te contacté anteriormente sobre *{{producto}}*.\n\nQuería saber si pudiste revisar la información.\n\n¿Tienes 10 minutos esta semana? 🙌' },
+  // ── Citas ──
+  { id: 'confirmacion',          nombre: '✅ Confirmar cita',            contenido: 'Hola {{nombre}} 👋\n\nTe confirmo tu cita para el *{{fecha}}* a las *{{hora}}*.\n\nTema: *{{producto}}*\nLink: {{zoom}}\n\n¡Te espero puntual! 😊\n\n— {{ejecutivo}}' },
+  { id: 'confirmacion_24h',      nombre: '🔔 Recordatorio 24h antes',    contenido: 'Hola {{nombre}}! 🔔\n\nTe recuerdo que *mañana {{fecha}}* a las *{{hora}}* tenemos nuestra reunión.\n\nTema: *{{producto}}*\nZoom: {{zoom}}\n\n¿Confirmas asistencia? ✅' },
+  { id: 'recordatorio',          nombre: '⏰ Recordatorio 1h antes',     contenido: 'Hola {{nombre}}! ⏰\n\n*¡En una hora nos vemos!*\n\nRecuerda: hoy a las *{{hora}}*\nZoom: {{zoom}}\n\n¡Te espero! 🙌' },
+  { id: 'reagendamiento',        nombre: '📅 Reagendar cita',            contenido: 'Hola {{nombre}} 😊\n\nHemos reagendado tu cita para el *{{fecha}}* a las *{{hora}}*.\n\nTema: *{{producto}}*\nZoom: {{zoom}}\n\n¡Nos vemos!' },
+  { id: 'reagendar_proactivo',   nombre: '🗓️ Proponer nueva fecha',      contenido: 'Hola {{nombre}} 👋\n\nQuería coordinar contigo una nueva fecha para conversar sobre *{{producto}}*.\n\n¿Qué día te acomoda esta semana? Tengo disponibilidad en la mañana y tarde 😊\n\n— {{ejecutivo}}' },
+  // ── Seguimiento ──
+  { id: 'seguimiento',           nombre: '📋 Seguimiento general',       contenido: 'Hola {{nombre}}! 😊\n\nQuería hacer un seguimiento sobre tu interés en *{{producto}}*.\n\n¿Pudiste pensar en nuestra propuesta?\n\nQuedo a tu disposición 🙌\n\n— {{ejecutivo}}' },
+  { id: 'propuesta_enviada',     nombre: '📄 Propuesta enviada',         contenido: 'Hola {{nombre}} 👋\n\nTe acabo de enviar la propuesta de *{{producto}}*.\n\n¿Puedes revisarla y me dices qué te parece? 😊\n\nEstoy disponible para resolver cualquier duda 💬\n\n— {{ejecutivo}}' },
+  { id: 'objecion_precio',       nombre: '💰 Manejo de precio',          contenido: 'Hola {{nombre}} 😊\n\nEntiendo que el precio es un factor importante.\n\nQuería contarte que tenemos opciones de financiamiento para *{{producto}}* que se adaptan a distintos presupuestos.\n\n¿Conversamos? 🙏\n\n— {{ejecutivo}}' },
+  // ── Post reunión ──
+  { id: 'post_reunion',          nombre: '🤝 Post reunión',              contenido: 'Hola {{nombre}} 🙏\n\nFue un placer conversar contigo hoy.\n\nQuedo atento/a a cualquier consulta sobre *{{producto}}*.\n\n¡Hasta pronto!\n\n— {{ejecutivo}}' },
+  { id: 'no_asistio',           nombre: '😔 No asistió — 1er contacto', contenido: 'Hola {{nombre}} 👋\n\nNotamos que no pudiste asistir a tu cita de hoy.\n\n¿Todo bien? No te preocupes, podemos reagendarla cuando gustes 😊\n\n— {{ejecutivo}}' },
+  { id: 'no_asistio_seguimiento',nombre: '🔁 No asistió — 2do intento', contenido: 'Hola {{nombre}}! 😊\n\nSé que a veces el tiempo no alcanza para todo.\n\nSi aún tienes interés en *{{producto}}*, me encantaría poder contarte más.\n\n¿Te parece si buscamos una nueva fecha? 🗓️\n\n— {{ejecutivo}}' },
+  // ── Cierre y postventa ──
+  { id: 'cierre',                nombre: '🎉 Cierre de venta',          contenido: 'Hola {{nombre}} 🎉\n\n¡Muchas gracias por tu confianza!\n\nQueda confirmada tu inscripción en *{{producto}}*.\n\nCualquier consulta, aquí estoy 💪\n\n— {{ejecutivo}}' },
+  { id: 'bienvenida_cliente',    nombre: '🌟 Bienvenida nuevo cliente',  contenido: 'Hola {{nombre}} 🌟\n\n¡Bienvenido/a a la familia!\n\nEs un gusto tenerte con nosotros en *{{producto}}*.\n\nEstaré aquí para acompañarte en todo el proceso. Cualquier duda, escríbeme 😊\n\n— {{ejecutivo}}' },
+  { id: 'pedir_referido',        nombre: '🤝 Pedir referido',           contenido: 'Hola {{nombre}} 😊\n\nEspero que estés muy contento/a con *{{producto}}*.\n\nSi tienes algún amigo, familiar o colega que pueda estar interesado, me encantaría poder ayudarlo/a también 🙌\n\n¿Se te viene alguien en mente?\n\n— {{ejecutivo}}' },
+  // ── Recuperación ──
+  { id: 'recuperacion',          nombre: '🔥 Recuperar lead (reciente)', contenido: 'Hola {{nombre}}! 😊\n\nHace unos días conversamos sobre *{{producto}}*.\n\nQuería retomar el contacto, ¿sigues interesado/a?\n\nTenemos condiciones especiales este mes 🔥\n\n— {{ejecutivo}}' },
+  { id: 'lead_frio',             nombre: '❄️ Reactivar lead frío',       contenido: 'Hola {{nombre}} 👋\n\nSoy *{{ejecutivo}}*, hace un tiempo conversamos sobre *{{producto}}*.\n\nSé que el momento no era el ideal entonces. Quería saber si ahora la situación cambió 😊\n\nTenemos novedades que creo te van a interesar 🌟' }
 ];
 
 export const templates = {
   async getAll() {
     const items = await cursorAll('templates');
     if (items.length === 0) {
+      // Primera vez: cargar todas las plantillas por defecto
       const s = tx('templates', 'readwrite');
       await Promise.all(DEFAULT_TEMPLATES.map(t => wrap(s.put(t))));
       return DEFAULT_TEMPLATES;
+    }
+    // Migración: agregar plantillas nuevas que no existan aún
+    const existingIds = new Set(items.map(i => i.id));
+    const missing = DEFAULT_TEMPLATES.filter(t => !existingIds.has(t.id));
+    if (missing.length > 0) {
+      const s = tx('templates', 'readwrite');
+      await Promise.all(missing.map(t => wrap(s.put(t))));
+      return [...items, ...missing];
     }
     return items;
   },

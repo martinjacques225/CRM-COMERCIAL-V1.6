@@ -1,7 +1,8 @@
 // modules/calculadora/calculadora.js
-import { PLANES } from '../../js/constants.js';
+import { PLANES } from '../../js/planes.js';
 import { S } from '../../js/state.js';
-import { fmtMoney, escHtml, calcIncentiveSemanal, todayStr } from '../../js/utils.js';
+import { fmtMoney, escHtml, todayStr } from '../../js/utils.js';
+import { calcIncentiveSemanal } from '../../services/commission.service.js';
 
 export function render() {
   const plan  = PLANES.find(p => p.id === S.calcPlan) || PLANES[0];

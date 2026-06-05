@@ -2,9 +2,8 @@
 // Orquestador puro: inicialización, navegación, registro de módulos.
 // Toda la lógica de negocio y UI está en js/ y modules/.
 
-// ── Capas base ──
-import { initDB, appointments, leads, calls, sales, templates, config } from './js/db.js';
-import { PLANES, MASCOTAS } from './js/constants.js';
+// ── Capas base (vía capa de servicios, nunca IndexedDB directo) ──
+import { initDB, appointments, calls, config } from './services/index.js';
 import { S } from './js/state.js';
 import { addDays, todayStr, showFileError, toast, vibrate } from './js/utils.js';
 

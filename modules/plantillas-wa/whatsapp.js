@@ -1,5 +1,5 @@
 // modules/plantillas-wa/whatsapp.js
-import { templates } from '../../js/db.js';
+import { templates } from '../../services/template.service.js';
 import { escHtml, toast } from '../../js/utils.js';
 
 export async function render() {

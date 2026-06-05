@@ -1,9 +1,13 @@
 // modules/dashboard/dashboard.js
-import { appointments, leads, sales, calls, config } from '../../js/db.js';
-import { PLANES } from '../../js/constants.js';
-import { fmtMoney, formatDate, todayStr, addDays,
-         getWeekStart, isContadoPlan, calcIncentiveSemanal,
-         calcTotalMedallas, calcNivel, calcMonthComision, escHtml } from '../../js/utils.js';
+import { appointments } from '../../services/appointment.service.js';
+import { leads } from '../../services/lead.service.js';
+import { sales } from '../../services/sales.service.js';
+import { calls } from '../../services/call.service.js';
+import { config } from '../../services/config.service.js';
+import { PLANES } from '../../js/planes.js';
+import { fmtMoney, formatDate, todayStr, addDays, escHtml } from '../../js/utils.js';
+import { getWeekStart, isContadoPlan, calcIncentiveSemanal, calcMonthComision } from '../../services/commission.service.js';
+import { calcTotalMedallas, calcNivel } from '../../services/medal.service.js';
 
 export async function render() {
   const center = document.getElementById('center');

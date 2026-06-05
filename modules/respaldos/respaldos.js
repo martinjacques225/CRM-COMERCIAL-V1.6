@@ -1,5 +1,7 @@
 // modules/respaldos/respaldos.js
-import { appointments, leads, sales } from '../../js/db.js';
+import { appointments } from '../../services/appointment.service.js';
+import { leads } from '../../services/lead.service.js';
+import { sales } from '../../services/sales.service.js';
 import { S } from '../../js/state.js';
 import { todayStr, toast, showFileError } from '../../js/utils.js';
 

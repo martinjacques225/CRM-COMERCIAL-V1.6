@@ -1,6 +1,8 @@
 // js/ui.js — Shell de UI: nav, topbar, icons, mascota, eventos globales, PWA
-import { appointments, calls, config } from './db.js';
-import { MASCOTAS, getMascotMsg } from './constants.js';
+import { appointments } from '../services/appointment.service.js';
+import { calls } from '../services/call.service.js';
+import { config } from '../services/config.service.js';
+import { MASCOTAS, getMascotMsg } from './mascotas.js';
 import { S } from './state.js';
 import { todayStr, nowTimeStr, escHtml, avatarColor, getInitials, toast, vibrate } from './utils.js';
 

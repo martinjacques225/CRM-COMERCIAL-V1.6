@@ -1,4 +1,4 @@
-const CACHE = 'crm-v6';
+const CACHE = 'crm-v8';
 const ASSETS = [
   // Shell
   './index.html',
@@ -8,9 +8,24 @@ const ASSETS = [
   './app.js',
   './js/db.js',
   './js/constants.js',
+  './js/planes.js',
+  './js/estados.js',
+  './js/mascotas.js',
   './js/state.js',
   './js/utils.js',
   './js/ui.js',
+  // Capa de servicios
+  './services/index.js',
+  './services/persistence.service.js',
+  './services/lead.service.js',
+  './services/appointment.service.js',
+  './services/sales.service.js',
+  './services/call.service.js',
+  './services/template.service.js',
+  './services/config.service.js',
+  './services/commission.service.js',
+  './services/medal.service.js',
+  './services/user.service.js',
   // Módulos de vista
   './modules/agenda/agenda.js',
   './modules/calculadora/calculadora.js',
@@ -19,6 +34,11 @@ const ASSETS = [
   './modules/leads/leads.js',
   './modules/medallas/medallas.js',
   './modules/modals/modals.js',
+  './modules/modals/modal-core.js',
+  './modules/modals/modal-cita.js',
+  './modules/modals/modal-lead.js',
+  './modules/modals/modal-venta.js',
+  './modules/modals/modal-wa.js',
   './modules/plantillas-wa/whatsapp.js',
   './modules/respaldos/respaldos.js',
   './modules/ventas/ventas.js',

@@ -1,5 +1,5 @@
 // modules/agenda/agenda.js
-import { appointments } from '../../js/db.js';
+import { appointments } from '../../services/appointment.service.js';
 import { S } from '../../js/state.js';
 import { todayStr, nowTimeStr, formatDate, escHtml, statusBadgeClass } from '../../js/utils.js';
 

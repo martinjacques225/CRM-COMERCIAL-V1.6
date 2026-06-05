@@ -1,8 +1,10 @@
 // modules/medallas/medallas.js
-import { sales, calls } from '../../js/db.js';
-import { PLANES } from '../../js/constants.js';
-import { fmtMoney, formatDate, todayStr, getWeekStart, isContadoPlan, groupByWeek,
-         calcIncentiveSemanal, calcMedallasSemanales, calcTotalMedallas, calcNivel } from '../../js/utils.js';
+import { sales } from '../../services/sales.service.js';
+import { calls } from '../../services/call.service.js';
+import { PLANES } from '../../js/planes.js';
+import { fmtMoney, formatDate, todayStr } from '../../js/utils.js';
+import { getWeekStart, isContadoPlan, groupByWeek, calcIncentiveSemanal } from '../../services/commission.service.js';
+import { calcMedallasSemanales, calcTotalMedallas, calcNivel } from '../../services/medal.service.js';
 
 export async function render() {
   const allSales      = await sales.getAll();
