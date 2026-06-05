@@ -12,9 +12,25 @@ Aplicación web progresiva (PWA) orientada a asesores comerciales y equipos de v
 ## Estado Actual del Desarrollo
 
 **Versión:** 3.2 (capa de servicios)
-**Fase actual:** ✅ *Fase Servicios* completada — arquitectura desacoplada, limpieza de deuda técnica y separación de archivos. Lista para diseñar la integración con Supabase (Fase 7).
+**Fase actual:** ✅ *Fase Servicios* COMPLETADA Y CERRADA — arquitectura desacoplada, limpieza de deuda técnica y separación de archivos. Sincronizada al repositorio Git.
 **Fases previas:** Auditoría técnica (✅) · Diseño de arquitectura multiusuario/Supabase (✅, ver `ARQUITECTURA_FASE2.md`).
 **Pendiente explícito:** NO se ha implementado Supabase ni multiusuario todavía. Sólo se preparó la base.
+**Verificación de la fase:** estática OK (sintaxis + 186 imports resueltos + cero acceso directo a IndexedDB desde la UI). Falta prueba funcional en navegador por el usuario.
+
+---
+
+## Ubicación de Trabajo y Flujo Git  ⚠️ LEER PRIMERO
+
+- **Carpeta de trabajo oficial (a partir de v3.2):** el **clon Git** en `C:\Users\velve\Documents\GitHub\CRM-COMERCIAL-V1.6`.
+  Remoto: `https://github.com/martinjacques225/CRM-COMERCIAL-V1.6.git` · rama base: `main`.
+- La carpeta antigua `RECURSOS UTILES APPS` quedó como copia de respaldo; **no trabajar ahí** para no desincronizar.
+- **Flujo acordado con el usuario:**
+  1. `main` siempre debe ser la versión que funciona.
+  2. Todo lo nuevo o de riesgo (Supabase, sincronización) se hace en una **rama** aparte (ej. `fase-3`), no directo en `main`.
+  3. Orden antes de fusionar/publicar: Claude verifica (sintaxis + imports) → **el usuario prueba en el navegador** → se revisa el diff en GitHub Desktop → Commit → Push → merge a `main` solo si funciona.
+  4. Retoques menores: commit a `main` pero siempre con revisión previa.
+  5. Nada se sube solo: Commit y Push son manuales. Todo cambio es reversible (Revert).
+- Claude no tiene credenciales de GitHub: prepara los cambios y el usuario hace Commit/Push desde GitHub Desktop.
 
 ---
 
