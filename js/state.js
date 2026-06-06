@@ -2,7 +2,7 @@
 // Importar siempre la misma referencia para garantizar consistencia entre módulos
 
 export const S = {
-  view:           'agenda',
+  view:           'home',
   date:           new Date().toISOString().slice(0, 10),
   searchQ:        '',
   searchEstado:   '',

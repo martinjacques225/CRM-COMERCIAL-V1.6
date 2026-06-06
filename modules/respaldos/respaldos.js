@@ -2,8 +2,11 @@
 import { appointments } from '../../services/appointment.service.js';
 import { leads } from '../../services/lead.service.js';
 import { sales } from '../../services/sales.service.js';
+import { config } from '../../services/config.service.js';
 import { S } from '../../js/state.js';
 import { todayStr, toast, showFileError } from '../../js/utils.js';
+
+const _markBackup = () => config.set('lastBackup', new Date().toISOString()).catch(() => {});
 
 // Iconos necesarios para esta vista (pasados desde app.js como parámetro en Etapa 4)
 // Por ahora se referencian como strings inline hasta que ui.js los centralice
@@ -33,6 +36,7 @@ export async function exportExcel() {
   const ws   = XLSX.utils.json_to_sheet(data), wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Citas');
   XLSX.writeFile(wb, `crm_citas_${todayStr()}.xlsx`);
+  _markBackup();
   toast('Excel exportado','success');
 }
 
@@ -125,6 +129,7 @@ export async function exportJSON() {
   const blob  = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const a     = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download  = `crm_backup_${todayStr()}.json`; a.click();
+  _markBackup();
   toast('JSON exportado','success');
 }
 

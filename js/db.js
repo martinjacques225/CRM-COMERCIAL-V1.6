@@ -1,8 +1,9 @@
 // js/db.js — Capa de acceso a datos (IndexedDB)
 // No modificar nombres de tablas ni estructuras — compatibilidad con datos existentes
+import { getWeekStart, calcTotalMedallas, calcNivel, nivelInfo } from './utils.js';
 
 const DB_NAME = 'AgendaComercialDB';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 let _db = null;
 
 export function initDB() {
@@ -36,6 +37,11 @@ export function initDB() {
         s.createIndex('fecha', 'fecha', { unique: false });
         s.createIndex('plan', 'plan', { unique: false });
       }
+      // v3: log de actividad reciente (no destructivo)
+      if (!db.objectStoreNames.contains('events')) {
+        const s = db.createObjectStore('events', { keyPath: 'id', autoIncrement: true });
+        s.createIndex('timestamp', 'timestamp', { unique: false });
+      }
     };
     req.onsuccess = e => { _db = e.target.result; resolve(_db); };
     req.onerror = () => reject(req.error);
@@ -65,6 +71,23 @@ function cursorAll(store) {
   });
 }
 
+// ── Log de eventos (actividad reciente) ──
+// Emisión segura: nunca interrumpe la operación principal si falla.
+async function _logEvent(tipo, titulo, detalle = '', refId = null) {
+  try {
+    const now = new Date().toISOString();
+    await wrap(tx('events', 'readwrite').add({ tipo, titulo, detalle, refId, timestamp: now }));
+  } catch { /* el log no debe romper la app */ }
+}
+
+export const events = {
+  getAll() { return cursorAll('events'); },
+  async getRecent(n = 8) {
+    const all = await cursorAll('events');
+    return all.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || '')).slice(0, n);
+  }
+};
+
 export const appointments = {
   add(data) {
     const now = new Date().toISOString();
@@ -80,7 +103,17 @@ export const appointments = {
       req.onerror = () => rej(req.error);
     });
   },
-  update(data) { data.fechaActualizacion = new Date().toISOString(); return wrap(tx('appointments', 'readwrite').put(data)); },
+  async update(data) {
+    let prev = null;
+    try { prev = await this.get(data.id); } catch {}
+    data.fechaActualizacion = new Date().toISOString();
+    const r = await wrap(tx('appointments', 'readwrite').put(data));
+    if (prev && prev.estado !== data.estado) {
+      if (data.estado === 'Reagendada') _logEvent('reagenda', 'Cita reagendada', data.nombre || '', data.id);
+      else if (data.estado === 'Contrató') _logEvent('venta', 'Cita marcada como contrató', data.nombre || '', data.id);
+    }
+    return r;
+  },
   delete(id)   { return wrap(tx('appointments', 'readwrite').delete(id)); },
   async checkConflict(fecha, hora, excludeId = null) {
     const all = await this.getByDate(fecha);
@@ -101,13 +134,24 @@ export const appointments = {
 };
 
 export const leads = {
-  add(data) {
+  async add(data) {
     const now = new Date().toISOString();
-    return wrap(tx('leads', 'readwrite').add({ ...data, estado: data.estado || 'Nuevo', historial: data.historial || [], fechaCreacion: now, fechaActualizacion: now }));
+    const id = await wrap(tx('leads', 'readwrite').add({ ...data, estado: data.estado || 'Nuevo', historial: data.historial || [], fechaCreacion: now, fechaActualizacion: now }));
+    _logEvent('lead', 'Nuevo lead agregado', `${data.nombre || ''} ${data.apellido || ''}`.trim(), id);
+    return id;
   },
   get(id)    { return wrap(tx('leads').get(id)); },
   getAll()   { return cursorAll('leads'); },
-  update(data) { data.fechaActualizacion = new Date().toISOString(); return wrap(tx('leads', 'readwrite').put(data)); },
+  async update(data) {
+    let prev = null;
+    try { prev = await this.get(data.id); } catch {}
+    data.fechaActualizacion = new Date().toISOString();
+    const r = await wrap(tx('leads', 'readwrite').put(data));
+    if (prev && prev.estado !== data.estado && data.estado) {
+      _logEvent('lead_estado', `Lead en ${String(data.estado).toLowerCase()}`, `${data.nombre || ''} ${data.apellido || ''}`.trim(), data.id);
+    }
+    return r;
+  },
   delete(id)   { return wrap(tx('leads', 'readwrite').delete(id)); },
   async addHistorial(id, entry) {
     const lead = await this.get(id);
@@ -161,9 +205,22 @@ export const calls = {
 };
 
 export const sales = {
-  add(data) {
+  async add(data) {
     const now = new Date().toISOString();
-    return wrap(tx('sales', 'readwrite').add({ ...data, fecha: data.fecha || now.slice(0, 10), timestamp: now }));
+    const before = await this.getAll();
+    const rec = { ...data, fecha: data.fecha || now.slice(0, 10), timestamp: now };
+    const id = await wrap(tx('sales', 'readwrite').add(rec));
+    _logEvent('venta', 'Venta registrada', data.plan || '', id);
+    // ¿Esta venta completó una nueva medalla? (1 medalla / 4 ventas semana)
+    try {
+      const medAntes = calcTotalMedallas(before);
+      const medAhora = calcTotalMedallas([...before, rec]);
+      if (medAhora > medAntes) {
+        const info = nivelInfo(calcNivel(medAhora));
+        _logEvent('medalla', 'Medalla obtenida', info.nombre, id);
+      }
+    } catch {}
+    return id;
   },
   get(id)    { return wrap(tx('sales').get(id)); },
   getAll()   { return cursorAll('sales'); },

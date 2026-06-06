@@ -72,7 +72,8 @@
 }
 
 /* ═══ BASE ═══ */
-html { font-size: 14px; -webkit-text-size-adjust: 100%; }
+html { font-size: 15px; -webkit-text-size-adjust: 100%; }
+@media (min-width: 1280px) { html { font-size: 16px; } }
 body {
   font-family: var(--font); background: var(--bg); color: var(--text);
   min-height: 100vh; overflow-x: hidden;
@@ -111,7 +112,7 @@ body {
 }
 .nav-brand-icon svg { width: 18px; height: 18px; fill: white; }
 .nav-brand-text h1 { font-size: 0.88rem; font-weight: 700; color: var(--text); line-height: 1.2; }
-.nav-brand-text span { font-size: 0.68rem; color: var(--text3); }
+.nav-brand-text span { font-size: 0.74rem; color: var(--text2); }
 
 .nav-user {
   padding: 10px 14px; border-bottom: 1px solid var(--border-soft);
@@ -125,19 +126,19 @@ body {
   font-size: 0.7rem; font-weight: 700; color: white; flex-shrink: 0; overflow: hidden;
 }
 .nav-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.nav-user-name { font-size: 0.8rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.nav-user-role { font-size: 0.66rem; color: var(--text3); }
+.nav-user-name { font-size: 0.85rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-user-role { font-size: 0.72rem; color: var(--text2); }
 
 .nav-section { padding: 10px 10px 2px; }
 .nav-section-label {
-  font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .1em; color: var(--text3); padding: 0 8px 5px;
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--text2); padding: 0 8px 5px;
 }
 .nav-item {
   display: flex; align-items: center; gap: 9px;
-  padding: 8px 10px; border-radius: var(--radius-sm);
+  padding: 9px 10px; border-radius: var(--radius-sm);
   cursor: pointer; transition: all var(--transition);
-  color: var(--text2); font-size: 0.83rem; font-weight: 500;
+  color: var(--text2); font-size: 0.86rem; font-weight: 500;
   border: none; background: none; width: 100%; text-align: left;
 }
 .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; }
@@ -162,8 +163,8 @@ body {
 .nav-footer { margin-top: auto; padding: 12px; border-top: 1px solid var(--border-soft); }
 .nav-status { display: flex; align-items: center; gap: 9px; padding: 4px 4px 10px; }
 .nav-status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px var(--success-bg); flex-shrink: 0; }
-.nav-status-on { font-size: .74rem; font-weight: 700; color: var(--text); line-height: 1.1; }
-.nav-status-sub { font-size: .66rem; font-weight: 500; color: var(--text3); }
+.nav-status-on { font-size: .78rem; font-weight: 700; color: var(--text); line-height: 1.1; }
+.nav-status-sub { font-size: .72rem; font-weight: 500; color: var(--text2); }
 .nav-install-btn {
   display: flex; align-items: center; gap: 8px;
   width: 100%; padding: 8px 10px; border: 1px dashed var(--border);
@@ -182,10 +183,10 @@ body {
   z-index: 100; justify-content: space-around; align-items: center;
 }
 .bottom-nav-item {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  padding: 6px 10px; border: none; background: none; cursor: pointer;
-  color: var(--text3); transition: all var(--transition);
-  font-size: .58rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  padding: 6px 8px; min-height: 48px; border: none; background: none; cursor: pointer;
+  color: var(--text2); transition: all var(--transition);
+  font-size: .66rem; font-weight: 700; letter-spacing: .02em;
   border-radius: var(--radius-sm); flex: 1;
   -webkit-tap-highlight-color: transparent;
 }
@@ -282,8 +283,8 @@ body {
 /* ═══ BADGES ═══ */
 .badge {
   display: inline-flex; align-items: center;
-  padding: 2px 8px; border-radius: 99px;
-  font-size: .68rem; font-weight: 600; white-space: nowrap;
+  padding: 3px 9px; border-radius: 99px;
+  font-size: .74rem; font-weight: 600; white-space: nowrap;
 }
 .badge-pendiente    { background: var(--s-pendiente-bg);    color: var(--s-pendiente); }
 .badge-asistio      { background: var(--s-asistio-bg);      color: var(--s-asistio); }
@@ -496,6 +497,34 @@ body {
 @media(max-width:768px){
   .tp-dropdown{width:200px;grid-template-columns:repeat(3,1fr);}
   .wi-header,.wi-row{grid-template-columns:90px 45px 55px 85px 85px 85px 70px;font-size:.63rem;}
+}
+
+/* ═══ FASE 0 UX: foco accesible, targets táctiles, contraste ═══ */
+/* Anillo de foco visible solo para navegación por teclado */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+.nav-item:focus-visible, .bottom-nav-item:focus-visible,
+.btn-primary:focus-visible, .btn-secondary:focus-visible,
+.btn-icon:focus-visible, .btn-action:focus-visible,
+.nav-user:focus-visible, .nav-level:focus-visible {
+  outline: 2px solid var(--primary); outline-offset: 2px;
+}
+/* Quita el outline por defecto solo cuando NO es teclado */
+*:focus:not(:focus-visible) { outline: none; }
+
+/* Targets táctiles cómodos en móvil */
+@media (max-width: 768px) {
+  .btn-icon { width: 40px; height: 40px; }
+  .tb-daynav .btn-icon { width: 38px; height: 38px; }
+  .modal-close { width: 36px; height: 36px; }
+}
+
+/* Tooltips para el nav lateral colapsado (769–900px) */
+@media (min-width: 769px) and (max-width: 900px) {
+  .nav-item, .nav-install-btn { position: relative; }
 }
 
 /* ═══ Mayúsculas automáticas (configurable) — solo feedback visual; el valor se normaliza al perder foco ═══ */

@@ -3,6 +3,27 @@
 
 ---
 
+## [3.4] — Nuevo Home + correcciones UX
+
+> Objetivo: rediseño del panel principal según mockup, como vista **Home** (landing) separada del Dashboard, más correcciones UX transversales. Sin tocar cálculos de comisión/BPI/medallas. Migración de datos no destructiva (DB v2→v3, solo añade el store `events`).
+
+### Añadido
+- **Vista Home** (`modules/home/home.js` + `home.css`): KPIs (Meta mensual, Próxima medalla, Comisión proyectada, BPI), **Misión del día** (citas hoy, seguimientos, leads calientes, venta para medalla, comisión) con mascota integrada, **Próximas citas**, **Actividad reciente**, **Rendimiento del mes** (mini-KPIs + donut + gráfico de evolución con selector Semana/Mes/Año) y banner motivacional con insight del mejor día. Reutiliza clases de `dashboard.css`. Es la vista inicial.
+- **Log de actividad** (`events`, DB v3): store no destructivo + `services/event.service.js` (`getRecent`). Se registran automáticamente: nuevo lead, cambio de estado de lead, venta, cita reagendada y medalla obtenida (emisión segura desde `js/db.js`, nunca interrumpe la operación).
+- **Niveles con nombre** (`utils.nivelInfo`): Bronze/Silver/Gold/Platino/Diamante × I-III, con color. Reemplaza "Nivel N" en el nav.
+- **`utils.mejorDiaSemana`** y **`utils.leadsCalientes`** (Seguimiento/Propuesta enviada con actividad ≤ 5 días).
+- **Último respaldo**: `config.lastBackup` se guarda al exportar Excel/JSON y se muestra en el footer del nav ("Hoy 11:30").
+
+### Mejorado (UX)
+- Tipografía base 15px (16px en ≥1280px) y piso de labels subido (se eliminaron tamaños ~8-9px en nav, bottom-nav, badges).
+- Contraste: textos informativos pasan de `--text3` a `--text2`.
+- Foco accesible: `:focus-visible` global con anillo del color primario.
+- Targets táctiles 40-44px en móvil; `title`/`aria-label` en nav lateral colapsado, bottom-nav y chevrons del topbar.
+- **Mascota menos intrusiva**: se eliminaron los tips temporizados (cada 5-8 min) y la aparición aleatoria por navegación. Ahora vive en el Home y solo reaparece en eventos con sentido (bienvenida, regreso, resultado de llamada, cita próxima).
+- Bottom-nav móvil: Home / Agenda / Leads / Comisión / Config (Stats movido al menú lateral).
+
+---
+
 ## [3.3] — Correcciones funcionales (Fase pulido pre-Supabase)
 
 > Objetivo: corregir bugs funcionales y completar comportamientos comerciales sin tocar la capa de servicios ni la persistencia. Compatibilidad total con datos actuales. NO incluye Supabase, sincronización ni multiusuario.
