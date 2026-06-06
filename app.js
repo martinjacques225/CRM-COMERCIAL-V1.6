@@ -22,7 +22,7 @@ import * as ModCalc      from './modules/calculadora/calculadora.js';
 import * as ModMedallas  from './modules/medallas/medallas.js';
 import * as ModDashboard from './modules/dashboard/dashboard.js';
 import * as ModWhatsapp  from './modules/plantillas-wa/whatsapp.js';
-import * as ModRespaldos from './modules/respaldos/respaldos.js';
+import * as ModInformes  from './modules/informes/informes.js';
 import * as ModConfig    from './modules/configuracion/configuracion.js';
 
 // ── Módulo de modales ──
@@ -50,7 +50,7 @@ async function refreshCenter() {
     mis_ventas:  ModVentas.render,
     medallas:    ModMedallas.render,
     dashboard:   ModDashboard.render,
-    respaldos:   ModRespaldos.render,
+    respaldos:   ModInformes.render,
     config:      ModConfig.render
   };
   if (map[S.view]) await map[S.view]();

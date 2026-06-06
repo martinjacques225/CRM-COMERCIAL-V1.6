@@ -3,6 +3,29 @@
 
 ---
 
+## [3.5] — Centro de Informes (Respaldos → Informes y Respaldos)
+
+> Objetivo: convertir el módulo Respaldos en un Centro de Informes empresarial que genera PDF profesional. Construido en 2 etapas. **Etapa 1**: 5 motores + portada + Leads, Ventas, Dashboard, Informe General. **Etapa 2 (completada)**: secciones Agenda, Comisiones y Medallas + informes "Rendimiento" (ventas+comisiones+medallas) y "Personalizado" (todas las secciones). Los 9 informes del registro `REPORTS` quedan disponibles.
+
+### Añadido — `modules/informes/` (arquitectura de 5 motores, escalable a Supabase)
+- **`data.engine.js`**: recolector por periodo (hoy/semana/mes/personalizado) desde `services/`. Cero hardcode. Normaliza leads, agenda, ventas, comisiones (motor mensual existente), medallas y KPIs de dashboard.
+- **`analytics.engine.js`**: reglas heurísticas → hallazgos neutros con severidad (leads sin seguimiento >5d, conversión, mejor origen, mejor/peor producto, mejor día, no-show, tramos de comisión, etc.) + `buildExecutive` (fortalezas/debilidades/oportunidades).
+- **`mascot.engine.js`**: redacta los hallazgos con la voz de cada mascota (ARIA/TITAN/ZEN/MAX/NOVA/ILLIDAN). **Hook `setAIProvider(fn)`** para enchufar IA real (Fase 8) sin reescribir; `voiceAsync` cae al motor local si no hay provider.
+- **`charts.engine.js`**: SVG con colores HEX fijos (barras, línea+área, donut, ranking, distribución) para rasterizado consistente en PDF. Sin librerías de gráficos.
+- **`templates.js`**: portada corporativa (logo, foto/iniciales, cargo/equipo/filial, periodo, mascota) + secciones Leads/Ventas/Dashboard + Resumen Ejecutivo General + bloque "Recomendación IA". Estilos fijos independientes del tema.
+- **`report.engine.js`**: orquesta periodo→datos→plantillas→PDF. Genera **PDF descargable** vía html2pdf (carga diferida por CDN, A4, pie con `CRM Comercial · usuario · fecha · Página X/Y`). Soporta selección múltiple → documento único combinado. Registro `REPORTS` marca informes de Etapa 2 como no disponibles.
+- **`informes.js` + `informes.css`**: vista "Informes y Respaldos" con Centro de Informes (selector múltiple, configurador de periodo, incluir gráficos/recomendaciones/KPIs/estadísticas) + respaldo de datos (reutiliza el motor de `respaldos.js`, sin duplicar).
+
+### Integración
+- `app.js`: router `respaldos` → `ModInformes.render` (se mantiene la clave de vista `respaldos`).
+- `js/ui.js`: nav y topbar renombrados a "Informes y Respaldos".
+- `index.html`: link a `informes.css`. html2pdf se carga diferido (no en el shell).
+- `sw.js`: `CACHE` `crm-v10` → `crm-v11` + nuevos archivos de `informes/`.
+
+**Riesgo:** Bajo. No toca cálculos de negocio ni persistencia; `respaldos.js` intacto como motor de backup. Verificado: sintaxis + imports OK. **Pendiente: probar en navegador (escritorio/móvil) y commit/push.**
+
+---
+
 ## [3.4] — Nuevo Home + correcciones UX
 
 > Objetivo: rediseño del panel principal según mockup, como vista **Home** (landing) separada del Dashboard, más correcciones UX transversales. Sin tocar cálculos de comisión/BPI/medallas. Migración de datos no destructiva (DB v2→v3, solo añade el store `events`).
