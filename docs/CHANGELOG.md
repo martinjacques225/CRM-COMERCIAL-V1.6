@@ -31,6 +31,13 @@
 ### Regla de negocio
 - Al eliminar/devolver una cita ligada a un lead, el lead vuelve a estado **Seguimiento** y queda disponible para re-agendar. Toda acción queda en el historial del lead (`cita_eliminada`, `devuelto_a_leads`, `recuperado_de_agenda`).
 
+### Mantenimiento / limpieza de repo
+- Eliminadas copias anidadas accidentales del proyecto dentro del clon Git: `CRM V3.0/`, `CRM V3.0 (1)/` y `CRM VENTAS LGS/`.
+- Eliminado `icon-192.png` (asset huérfano, 0 referencias en código; manifest y `sw.js` solo usan `icon-crm-192/512` e `icon-lgs`).
+- `INSTRUCCIONES_PROYECTO_NUEVO.md` movido del raíz a `docs/`.
+- `.gitignore`: añadidos patrones para evitar que reaparezcan las copias anidadas y el MD de instrucciones en el raíz.
+- Verificación estática post-limpieza: sintaxis OK en 36 `.js`, 114 imports relativos resueltos (0 rotos), recursos de `index.html`/`manifest.json` existentes.
+
 ### Archivos modificados
 - `js/utils.js`, `js/ui.js`, `app.js`, `js/planes.js`, `js/state.js`, `services/commission.service.js`
 - `modules/calculadora/calculadora.js`, `modules/calculadora/calculadora.css`, `modules/modals/modal-wa.js`, `modules/modals/modal-cita.js`, `modules/modals/modals.js`
