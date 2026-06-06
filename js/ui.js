@@ -2,9 +2,11 @@
 import { appointments } from '../services/appointment.service.js';
 import { calls } from '../services/call.service.js';
 import { config } from '../services/config.service.js';
+import { sales } from '../services/sales.service.js';
+import { calcTotalMedallas, calcNivel } from '../services/medal.service.js';
 import { MASCOTAS, getMascotMsg } from './mascotas.js';
 import { S } from './state.js';
-import { todayStr, nowTimeStr, escHtml, avatarColor, getInitials, toast, vibrate } from './utils.js';
+import { todayStr, nowTimeStr, escHtml, avatarColor, getInitials, toast, vibrate, formatDateLong } from './utils.js';
 
 // ═══ ICONS ═══ (centralizado aquí desde Etapa 4)
 export const ico = {
@@ -45,25 +47,47 @@ export async function renderNav() {
   const bannerUrl = await config.get('bannerUrl');
   const cargo     = await config.get('cargo') || '';
   const filial    = await config.get('filial') || '';
+  const equipo    = await config.get('equipo') || '';
   const bg        = avatarColor(userName);
   const avContent = avatar ? `<img src="${avatar}" alt="">` : getInitials(userName);
+  S.userName = userName;  // usado por el header de saludo del dashboard
+
+  // Nivel y medallas (motor existente, sin nueva lógica)
+  let nivel = 0, medEnNivel = 0;
+  try {
+    const allS = await sales.getAll();
+    const totalMed = calcTotalMedallas(allS);
+    nivel = calcNivel(totalMed); medEnNivel = totalMed % 5;
+  } catch {}
+  const subtitulo = [cargo || mascota.nombre, equipo || filial].filter(Boolean).join(' · ');
+
   const sections  = [
-    { label:'AGENDA',     items:[{id:'agenda',label:'Agenda',icon:ico.calendar},{id:'leads',label:'Leads',icon:ico.people},{id:'whatsapp',label:'Plantillas WA',icon:ico.whatsapp}] },
-    { label:'COMISIONES', items:[{id:'calculadora',label:'Calculadora',icon:ico.money},{id:'mis_ventas',label:'Mis ventas',icon:ico.chart},{id:'medallas',label:'Medallas',icon:ico.medal}] },
-    { label:'DASHBOARDS', items:[{id:'dashboard',label:'Dashboard',icon:ico.chart},{id:'respaldos',label:'Respaldos',icon:ico.backup},{id:'config',label:'Configuración',icon:ico.settings}] }
+    { label:'COMERCIAL',  items:[{id:'dashboard',label:'Dashboard',icon:ico.grid},{id:'agenda',label:'Agenda',icon:ico.calendar},{id:'leads',label:'Leads',icon:ico.people},{id:'whatsapp',label:'Plantillas WhatsApp',icon:ico.whatsapp}] },
+    { label:'RENDIMIENTO',items:[{id:'mis_ventas',label:'Mis ventas',icon:ico.chart},{id:'calculadora',label:'Comisiones',icon:ico.money},{id:'medallas',label:'Medallas',icon:ico.medal}] },
+    { label:'SISTEMA',    items:[{id:'respaldos',label:'Respaldos',icon:ico.backup},{id:'config',label:'Configuración',icon:ico.settings}] }
   ];
   document.getElementById('nav').innerHTML = `
     ${bannerUrl ? `<div class="nav-banner"><img src="${bannerUrl}" alt="Banner"></div>` : ''}
     <div class="nav-brand">
       <div class="nav-brand-icon" style="background:none;padding:0;overflow:hidden"><img src="icon-lgs.png" alt="LGS" style="width:34px;height:34px;object-fit:cover;border-radius:var(--radius-sm)"></div>
-      <div class="nav-brand-text"><h1>CRM Comercial</h1><span>v3.1</span></div>
+      <div class="nav-brand-text"><h1>CRM Comercial</h1><span>v3.3</span></div>
     </div>
     <div class="nav-user" onclick="window._app?.navigate?.('config')" style="cursor:pointer">
       <div class="nav-user-avatar" style="background:${bg}">${avContent}</div>
       <div class="nav-user-info">
         <div class="nav-user-name">${escHtml(userName)}</div>
-        <div class="nav-user-role">${mascota.emoji} ${cargo || mascota.nombre}${filial ? ' · ' + escHtml(filial) : ''}</div>
+        <div class="nav-user-role">${escHtml(subtitulo)}</div>
       </div>
+    </div>
+    <div class="nav-level" onclick="window._app?.navigate?.('medallas')">
+      <div class="nav-level-top">
+        <span class="nav-level-medal">${ico.medal}</span>
+        <div class="nav-level-info">
+          <div class="nav-level-name">Nivel ${nivel}</div>
+          <div class="nav-level-sub">${medEnNivel} de 5 medallas</div>
+        </div>
+      </div>
+      <div class="nav-level-bar"><div class="nav-level-fill" style="width:${medEnNivel/5*100}%"></div></div>
     </div>
     ${sections.map(sec => `
       <div class="nav-section">
@@ -71,6 +95,7 @@ export async function renderNav() {
         ${sec.items.map(i => `<button class="nav-item${S.view===i.id?' active':''}" data-view="${i.id}">${i.icon}<span>${i.label}</span></button>`).join('')}
       </div>`).join('')}
     <div class="nav-footer">
+      <div class="nav-status"><span class="nav-status-dot"></span><div><div class="nav-status-on">Conectado</div><div class="nav-status-sub">Sincronizado</div></div></div>
       <button class="nav-install-btn" id="installBtn" style="${S.deferredInstall?'':'display:none'}">${ico.install}<span>Instalar app</span></button>
     </div>`;
   document.getElementById('nav').querySelectorAll('.nav-item').forEach(btn => {
@@ -106,6 +131,26 @@ export function renderTopbar(addDaysFn, refreshViewFn, openFormModalFn, openLead
     document.getElementById('nextDay').addEventListener('click',   () => { S.date = addDaysFn(S.date, 1); refreshViewFn(); });
     document.querySelector('.btn-today').addEventListener('click', () => { S.date = todayStr(); refreshViewFn(); });
     document.getElementById('btnNewAppt').addEventListener('click', () => openFormModalFn());
+  } else if (S.view === 'dashboard') {
+    const hh = new Date().getHours();
+    const saludo = hh < 12 ? 'Buenos días' : hh < 19 ? 'Buenas tardes' : 'Buenas noches';
+    tb.innerHTML = `
+      <div class="tb-greet">
+        <div class="tb-greet-title">¡${saludo}, ${escHtml((S.userName || 'Asesor').split(' ')[0])}! 👋</div>
+        <div class="tb-greet-date">${formatDateLong(todayStr())}</div>
+      </div>
+      <div class="tb-actions">
+        <div class="tb-daynav">
+          <button class="btn-icon" id="dPrev" aria-label="Día anterior">${ico.chevLeft}</button>
+          <button class="btn-today" id="dToday">Hoy</button>
+          <button class="btn-icon" id="dNext" aria-label="Día siguiente">${ico.chevRight}</button>
+        </div>
+        <button class="btn-primary" id="dNewAppt">${ico.plus}<span>Nueva cita</span></button>
+      </div>`;
+    document.getElementById('dToday').addEventListener('click', () => { S.date = todayStr(); window._app?.navigate?.('agenda'); });
+    document.getElementById('dPrev').addEventListener('click',  () => { S.date = addDaysFn(todayStr(), -1); window._app?.navigate?.('agenda'); });
+    document.getElementById('dNext').addEventListener('click',  () => { S.date = addDaysFn(todayStr(), 1);  window._app?.navigate?.('agenda'); });
+    document.getElementById('dNewAppt').addEventListener('click', () => openFormModalFn());
   } else {
     const titles = { leads:'Leads', whatsapp:'Plantillas WhatsApp', calculadora:'Calculadora de Comisiones',
       mis_ventas:'Mis Ventas', medallas:'Medallas & Nivel', dashboard:'Dashboard',

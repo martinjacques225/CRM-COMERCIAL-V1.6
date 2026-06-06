@@ -1,4 +1,4 @@
-const CACHE = 'crm-v8';
+const CACHE = 'crm-v9';
 const ASSETS = [
   // Shell
   './index.html',
