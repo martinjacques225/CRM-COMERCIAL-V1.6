@@ -1,4 +1,4 @@
-const CACHE = 'crm-v10';
+const CACHE = 'crm-v11';
 const ASSETS = [
   // Shell
   './index.html',
@@ -44,6 +44,14 @@ const ASSETS = [
   './modules/modals/modal-wa.js',
   './modules/plantillas-wa/whatsapp.js',
   './modules/respaldos/respaldos.js',
+  './modules/informes/informes.js',
+  './modules/informes/informes.css',
+  './modules/informes/data.engine.js',
+  './modules/informes/analytics.engine.js',
+  './modules/informes/mascot.engine.js',
+  './modules/informes/charts.engine.js',
+  './modules/informes/templates.js',
+  './modules/informes/report.engine.js',
   './modules/ventas/ventas.js',
   // Assets
   './icon-lgs.png',

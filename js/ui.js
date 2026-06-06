@@ -67,7 +67,7 @@ export async function renderNav() {
   const sections  = [
     { label:'COMERCIAL',  items:[{id:'home',label:'Home',icon:ico.home},{id:'dashboard',label:'Dashboard',icon:ico.grid},{id:'agenda',label:'Agenda',icon:ico.calendar},{id:'leads',label:'Leads',icon:ico.people},{id:'whatsapp',label:'Plantillas WhatsApp',icon:ico.whatsapp}] },
     { label:'RENDIMIENTO',items:[{id:'mis_ventas',label:'Mis ventas',icon:ico.chart},{id:'calculadora',label:'Comisiones',icon:ico.money},{id:'medallas',label:'Medallas',icon:ico.medal}] },
-    { label:'SISTEMA',    items:[{id:'respaldos',label:'Respaldos',icon:ico.backup},{id:'config',label:'Configuración',icon:ico.settings}] }
+    { label:'SISTEMA',    items:[{id:'respaldos',label:'Informes y Respaldos',icon:ico.backup},{id:'config',label:'Configuración',icon:ico.settings}] }
   ];
   document.getElementById('nav').innerHTML = `
     ${bannerUrl ? `<div class="nav-banner"><img src="${bannerUrl}" alt="Banner"></div>` : ''}
@@ -99,7 +99,7 @@ export async function renderNav() {
       </div>`).join('')}
     <div class="nav-footer">
       <div class="nav-status"><span class="nav-status-dot"></span><div><div class="nav-status-on">Sincronizado</div><div class="nav-status-sub">${lastBackup ? 'Último respaldo: ' + _backupLabel(lastBackup) : 'Sin respaldos aún'}</div></div></div>
-      <button class="nav-install-btn" id="backupBtn"><span>Ver respaldos</span></button>
+      <button class="nav-install-btn" id="backupBtn"><span>Informes y respaldos</span></button>
       <button class="nav-install-btn" id="installBtn" style="${S.deferredInstall?'margin-top:6px':'display:none'}">${ico.install}<span>Instalar app</span></button>
     </div>`;
   document.getElementById('nav').querySelectorAll('.nav-item').forEach(btn => {
@@ -170,7 +170,7 @@ export function renderTopbar(addDaysFn, refreshViewFn, openFormModalFn, openLead
   } else {
     const titles = { leads:'Leads', whatsapp:'Plantillas WhatsApp', calculadora:'Calculadora de Comisiones',
       mis_ventas:'Mis Ventas', medallas:'Medallas & Nivel', dashboard:'Dashboard',
-      respaldos:'Respaldos', config:'Configuración' };
+      respaldos:'Informes y Respaldos', config:'Configuración' };
     tb.innerHTML = `
       <span class="topbar-title">${titles[S.view]||''}</span>
       ${S.view==='leads'     ? `<button class="btn-primary" id="btnNewLead">${ico.plus}<span>Nuevo lead</span></button>`       : ''}
