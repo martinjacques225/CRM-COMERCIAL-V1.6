@@ -22,7 +22,7 @@
 .rep-opt input:checked ~ .rep-opt-box { background: var(--primary); border-color: var(--primary); }
 .rep-opt input:checked ~ .rep-opt-box::after { content: '✓'; position: absolute; inset: 0; color: #fff; font-size: 12px; display: flex; align-items: center; justify-content: center; }
 .rep-opt-txt { font-size: .82rem; color: var(--text); font-weight: 600; }
-.rep-opt-txt em { display: block; font-size: .64rem; color: var(--text3); font-style: normal; font-weight: 500; margin-top: 1px; }
+.rep-opt-txt em { display: block; font-size: .68rem; color: var(--text3); font-style: normal; font-weight: 500; margin-top: 1px; }
 .rep-opt.off { opacity: .55; cursor: not-allowed; }
 .rep-opt.off:hover { border-color: var(--border); background: var(--surface); }
 

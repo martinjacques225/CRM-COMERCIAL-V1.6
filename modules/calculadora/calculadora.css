@@ -14,7 +14,7 @@
 .plan-card-name { font-size: .87rem; font-weight: 700; color: var(--text); margin-bottom: 1px; }
 .plan-card-desc { font-size: .72rem; color: var(--text2); }
 .plan-card-badge {
-  display: inline-block; font-size: .6rem; font-weight: 700; text-transform: uppercase;
+  display: inline-block; font-size: .66rem; font-weight: 700; text-transform: uppercase;
   padding: 2px 6px; border-radius: 99px; letter-spacing: .06em; margin-top: 3px;
   background: var(--primary-light); color: var(--primary);
 }
@@ -98,7 +98,7 @@
 .sim-plan-dot { display: inline-block; width: 8px; height: 8px; border-radius: 99px; margin-right: 6px; vertical-align: middle; }
 .sim-plan-name { font-weight: 600; color: var(--text); }
 .sim-plan-com { display: inline-block; margin-left: 8px; font-size: .7rem; color: var(--success); font-weight: 700; font-variant-numeric: tabular-nums; }
-.sim-tag { font-size: .58rem; font-weight: 700; text-transform: uppercase; padding: 1px 5px; border-radius: 99px; background: var(--success-bg); color: var(--success); letter-spacing: .04em; }
+.sim-tag { font-size: .64rem; font-weight: 700; text-transform: uppercase; padding: 1px 5px; border-radius: 99px; background: var(--success-bg); color: var(--success); letter-spacing: .04em; }
 .sim-input {
   width: 46px; padding: 6px 4px; border: 1px solid var(--border); border-radius: var(--radius-xs);
   background: var(--surface2); color: var(--text); font-family: var(--font); font-size: .85rem;

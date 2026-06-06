@@ -49,7 +49,7 @@
 .mascot-option:hover { border-color: var(--primary); transform: translateY(-2px); }
 .mascot-option.selected { border-color: var(--primary); background: var(--primary-light); }
 .mascot-option-emoji { font-size: 1.7rem; }
-.mascot-option-name { font-size: .6rem; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .05em; }
+.mascot-option-name { font-size: .66rem; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .05em; }
 
 .theme-selector { display: flex; gap: 7px; }
 .theme-option {

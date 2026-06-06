@@ -73,7 +73,7 @@ export async function renderNav() {
     ${bannerUrl ? `<div class="nav-banner"><img src="${bannerUrl}" alt="Banner"></div>` : ''}
     <div class="nav-brand">
       <div class="nav-brand-icon" style="background:none;padding:0;overflow:hidden"><img src="icon-lgs.png" alt="LGS" style="width:34px;height:34px;object-fit:cover;border-radius:var(--radius-sm)"></div>
-      <div class="nav-brand-text"><h1>CRM Comercial</h1><span>v3.3</span></div>
+      <div class="nav-brand-text"><h1>CRM Comercial</h1><span>v3.5</span></div>
     </div>
     <div class="nav-user" onclick="window._app?.navigate?.('config')" style="cursor:pointer">
       <div class="nav-user-avatar" style="background:${bg}">${avContent}</div>

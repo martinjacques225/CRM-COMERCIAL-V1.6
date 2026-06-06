@@ -23,10 +23,10 @@
 .medal-desc { font-size: .68rem; color: var(--text2); line-height: 1.35; }
 .medal-progress { margin-top: 9px; height: 3px; background: var(--surface3); border-radius: 99px; overflow: hidden; }
 .medal-progress-fill { height:100%; border-radius:99px; background: var(--primary); transition: width 1s ease; }
-.medal-progress-label { font-size: .62rem; color: var(--text3); margin-top: 3px; }
+.medal-progress-label { font-size: .67rem; color: var(--text3); margin-top: 3px; }
 .medal-earned-badge {
   position: absolute; top: 7px; right: 7px;
-  font-size: .58rem; font-weight: 700; text-transform: uppercase;
+  font-size: .64rem; font-weight: 700; text-transform: uppercase;
   padding: 2px 5px; border-radius: 99px;
   background: var(--success); color: white; letter-spacing: .04em;
 }
