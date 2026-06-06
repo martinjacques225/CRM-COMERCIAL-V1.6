@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 /* ═══ VARIABLES — TEMA CLARO ═══ */
 :root {
-  --bg: #F0F4F8;
+  --bg: #F5F7FB;
   --surface: #FFFFFF;
   --surface2: #F8FAFC;
   --surface3: #F1F5F9;
@@ -34,9 +34,9 @@
   --shadow: 0 4px 16px rgba(15,23,42,.08), 0 1px 3px rgba(15,23,42,.05);
   --shadow-lg: 0 10px 40px rgba(15,23,42,.12), 0 4px 12px rgba(15,23,42,.06);
   --radius: 12px; --radius-sm: 8px; --radius-xs: 6px; --radius-xl: 16px;
-  --nav-w: 228px; --panel-w: 276px;
-  --topbar-h: 52px; --bottom-nav-h: 60px;
-  --font: 'Plus Jakarta Sans', sans-serif;
+  --nav-w: 256px; --panel-w: 320px;
+  --topbar-h: 56px; --bottom-nav-h: 60px;
+  --font: 'Inter', system-ui, sans-serif;
   --mono: 'DM Mono', monospace;
   --transition: 0.18s cubic-bezier(.4,0,.2,1);
   --spring: 0.32s cubic-bezier(.34,1.56,.64,1);
@@ -148,7 +148,22 @@ body {
   font-size: .58rem; font-weight: 700; padding: 1px 5px; border-radius: 99px;
 }
 
+/* Nivel actual (sidebar) */
+.nav-level { margin: 8px 12px 4px; padding: 11px 12px; border-radius: var(--radius); background: linear-gradient(135deg, var(--primary-light), var(--surface2)); border: 1px solid var(--border); cursor: pointer; transition: all var(--transition); }
+.nav-level:hover { border-color: var(--primary); }
+.nav-level-top { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+.nav-level-medal { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, #94A3B8, #CBD5E1); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.nav-level-medal svg { width: 17px; height: 17px; }
+.nav-level-name { font-size: .85rem; font-weight: 800; color: var(--text); line-height: 1.1; }
+.nav-level-sub { font-size: .68rem; font-weight: 500; color: var(--text2); }
+.nav-level-bar { height: 6px; border-radius: 99px; background: var(--surface3); overflow: hidden; }
+.nav-level-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--primary), #60A5FA); transition: width .8s ease; }
+
 .nav-footer { margin-top: auto; padding: 12px; border-top: 1px solid var(--border-soft); }
+.nav-status { display: flex; align-items: center; gap: 9px; padding: 4px 4px 10px; }
+.nav-status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px var(--success-bg); flex-shrink: 0; }
+.nav-status-on { font-size: .74rem; font-weight: 700; color: var(--text); line-height: 1.1; }
+.nav-status-sub { font-size: .66rem; font-weight: 500; color: var(--text3); }
 .nav-install-btn {
   display: flex; align-items: center; gap: 8px;
   width: 100%; padding: 8px 10px; border: 1px dashed var(--border);
@@ -179,10 +194,18 @@ body {
 
 /* ═══ TOPBAR ═══ */
 #topbar {
-  height: var(--topbar-h); min-height: var(--topbar-h);
+  min-height: var(--topbar-h);
   background: var(--surface); border-bottom: 1px solid var(--border);
-  padding: 0 16px; display: flex; align-items: center; gap: 10px; z-index: 5;
+  padding: 8px 20px; display: flex; align-items: center; gap: 10px; z-index: 5;
 }
+/* Header de saludo (dashboard) */
+.tb-greet { flex: 1; display: flex; flex-direction: column; gap: 1px; }
+.tb-greet-title { font-size: 1.18rem; font-weight: 800; color: var(--text); letter-spacing: -.01em; line-height: 1.15; }
+.tb-greet-date { font-size: .78rem; font-weight: 500; color: var(--text2); text-transform: capitalize; }
+.tb-actions { display: flex; align-items: center; gap: 8px; }
+.tb-daynav { display: flex; align-items: center; gap: 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 2px; }
+.tb-daynav .btn-icon { width: 26px; height: 26px; border: none; background: none; }
+.tb-daynav .btn-today { border: none; background: none; padding: 4px 10px; }
 .topbar-title { font-size: .96rem; font-weight: 700; color: var(--text); flex: 1; }
 .topbar-date-nav { display: flex; align-items: center; gap: 6px; flex: 1; }
 .date-display { font-size: .88rem; font-weight: 600; color: var(--text); text-transform: capitalize; padding: 0 4px; }

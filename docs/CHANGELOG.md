@@ -32,6 +32,15 @@
 ### Regla de negocio
 - Al eliminar/devolver una cita ligada a un lead, el lead vuelve a estado **Seguimiento** y queda disponible para re-agendar. Toda acción queda en el historial del lead (`cita_eliminada`, `devuelto_a_leads`, `recuperado_de_agenda`).
 
+### Rediseño — Dashboard ejecutivo (estilo SaaS enterprise)
+- **Dashboard completo rediseñado** (solo presentación; sin tocar servicios, motores ni arquitectura). Nuevo layout: fila de 4 KPIs (Sueldo del mes, BPI acumulado, Medallas, Conversión) con barra de meta; 2 gráficos (ventas semanales en barras Lun–Dom + progreso mensual en línea, ambos SVG/CSS inline, sin librerías); Agenda de hoy compacta (≤68px por cita, acciones Llamar/WhatsApp/Editar); Últimos 5 leads; banner motivacional con mascota y progreso a la próxima medalla.
+- **Panel derecho del dashboard** (`renderPanel` propio, patrón igual a Agenda): donut "Tu rendimiento", "Próxima medalla", "Comisión proyectada" (proyección lineal de cierre, solo display) y "Accesos rápidos".
+- **Sidebar premium**: secciones reordenadas a COMERCIAL / RENDIMIENTO / SISTEMA, tarjeta "Nivel actual" con medallas y barra de progreso, footer de estado (Conectado · Sincronizado).
+- **Header de saludo** en el dashboard (¡Buenos días, {nombre}! + fecha + navegación de día + Nueva cita).
+- **Tema**: fuente Inter, fondo `#F5F7FB`, anchos sidebar/panel 256/320, radios y sombras de tarjeta más suaves. Metas de KPI configurables (`metaSueldo`/`metaBPI`, con defaults).
+- `app.js`: el panel derecho ahora es por-vista (dashboard usa su propio panel; el resto, el de agenda). `sw.js` CACHE → `crm-v9`.
+- Verificación: estática (sintaxis + 118 imports resueltos) y **runtime end-to-end** con IndexedDB + DOM simulados (render y panel sin errores, KPIs/gráficos/listas generados desde datos reales).
+
 ### Mantenimiento / limpieza de repo
 - Eliminadas copias anidadas accidentales del proyecto dentro del clon Git: `CRM V3.0/`, `CRM V3.0 (1)/` y `CRM VENTAS LGS/`.
 - Eliminado `icon-192.png` (asset huérfano, 0 referencias en código; manifest y `sw.js` solo usan `icon-crm-192/512` e `icon-lgs`).

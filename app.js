@@ -53,7 +53,8 @@ async function refreshCenter() {
     config:      ModConfig.render
   };
   if (map[S.view]) await map[S.view]();
-  await ModAgenda.renderPanel();
+  if (S.view === 'dashboard') await ModDashboard.renderPanel();
+  else await ModAgenda.renderPanel();
 }
 
 export async function refreshView() {
