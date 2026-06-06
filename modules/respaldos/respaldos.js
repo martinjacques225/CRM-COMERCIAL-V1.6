@@ -23,8 +23,8 @@ export function render() {
   </div></div>`;
   document.getElementById('expExcel').addEventListener('click', exportExcel);
   document.getElementById('expJson').addEventListener('click',  exportJSON);
-  document.getElementById('impExcel').addEventListener('change', e => importLeadsExcel(e.target.files[0]));
-  document.getElementById('impJson').addEventListener('change',  e => importJSON(e.target.files[0]));
+  document.getElementById('impExcel').addEventListener('change', e => { importLeadsExcel(e.target.files[0]); e.target.value = ''; });
+  document.getElementById('impJson').addEventListener('change',  e => { importJSON(e.target.files[0]); e.target.value = ''; });
 }
 
 export async function exportExcel() {
@@ -36,6 +36,38 @@ export async function exportExcel() {
   toast('Excel exportado','success');
 }
 
+// Normaliza texto para comparar encabezados (sin acentos, minúsculas, solo alfanumérico)
+const _norm = s => String(s ?? '').trim().toLowerCase()
+  .normalize('NFD').replace(/[̀-ͯ]/g, '')
+  .replace(/[^a-z0-9]+/g, ' ').trim();
+
+// Sinónimos por campo del lead → se mapea por "el encabezado incluye la palabra clave"
+const LEAD_COLS = {
+  nombre:        ['nombre', 'first'],
+  apellido:      ['apellido', 'last'],
+  telefono:      ['telefono', 'tel', 'fono', 'celular', 'movil', 'whatsapp', 'phone'],
+  email:         ['email', 'correo', 'mail'],
+  empresa:       ['empresa', 'organizacion', 'compania', 'company'],
+  cargo:         ['cargo', 'rol', 'puesto', 'position'],
+  interes:       ['interes', 'producto', 'plan', 'area'],
+  origen:        ['origen', 'fuente', 'canal', 'source'],
+  observaciones: ['observacion', 'nota', 'comentario', 'obs']
+};
+
+// Mapea cada campo a su índice de columna según los encabezados reales del archivo
+function mapLeadCols(headerRow) {
+  const map = {};
+  headerRow.forEach((cell, idx) => {
+    const h = _norm(cell);
+    if (!h) return;
+    for (const [field, keys] of Object.entries(LEAD_COLS)) {
+      if (map[field] !== undefined) continue;
+      if (keys.some(k => h.includes(k))) { map[field] = idx; break; }
+    }
+  });
+  return map;
+}
+
 export async function importLeadsExcel(file) {
   if (!file) return;
   if (!window.XLSX) { toast('SheetJS no cargado','warn'); return; }
@@ -44,16 +76,45 @@ export async function importLeadsExcel(file) {
   const reader = new FileReader();
   reader.onload = async e => {
     try {
-      const wb   = XLSX.read(e.target.result, { type: 'array' });
-      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-      let count  = 0;
-      for (const row of rows) {
-        const nombre = row.nombre || row.Nombre || row.NOMBRE || ''; if (!nombre) continue;
-        await leads.add({ nombre, apellido: row.apellido||row.Apellido||'', telefono: String(row.telefono||row.Telefono||''), email: row.email||row.Email||'', empresa: row.empresa||row.Empresa||'', cargo: row.cargo||row.Cargo||'', interes: row.interes||row.Interes||'', origen: row.origen||row.Origen||'', observaciones: row.observaciones||'', estado: 'Nuevo' });
+      const wb  = XLSX.read(e.target.result, { type: 'array' });
+      const ws  = wb.Sheets[wb.SheetNames[0]];
+      // Leemos como matriz cruda para ubicar la fila de encabezados real (la plantilla tiene título arriba)
+      const grid = XLSX.utils.sheet_to_json(ws, { header: 1, blankrows: false, defval: '' });
+      const hIdx = grid.findIndex(r => r.some(c => _norm(c) === 'nombre'));
+      if (hIdx === -1) { showFileError('No encontré la columna NOMBRE en el archivo. Usa la plantilla.','🧐'); return; }
+      const col = mapLeadCols(grid[hIdx]);
+      // Si existe la fila marcadora ("▼ Agrega tus leads…"), los datos reales empiezan tras ella
+      let start = hIdx + 1;
+      const mIdx = grid.findIndex((r, i) => i > hIdx && r.some(c => _norm(c).includes('agrega tus leads') || String(c).includes('▼')));
+      if (mIdx !== -1) start = mIdx + 1;
+
+      const nCol = col.nombre;
+      const get  = (row, f) => col[f] !== undefined ? String(row[col[f]] ?? '').trim() : '';
+      let count = 0;
+      for (let i = start; i < grid.length; i++) {
+        const nombre = String(grid[i][nCol] ?? '').trim();
+        const nlc = _norm(nombre);
+        if (!nombre) continue;
+        // saltar filas de ayuda/marcador remanentes
+        if (nlc.startsWith('nombre de pila') || nlc.includes('agrega tus leads') || nombre.includes('▼')) continue;
+        const r = grid[i];
+        await leads.add({
+          nombre,
+          apellido:      get(r, 'apellido'),
+          telefono:      get(r, 'telefono'),
+          email:         get(r, 'email'),
+          empresa:       get(r, 'empresa'),
+          cargo:         get(r, 'cargo'),
+          interes:       get(r, 'interes'),
+          origen:        get(r, 'origen'),
+          observaciones: get(r, 'observaciones'),
+          estado: 'Nuevo'
+        });
         count++;
       }
+      if (count === 0) { showFileError('No encontré leads con nombre para importar. Revisa la columna NOMBRE.','🤔'); return; }
       toast(`${count} leads importados`, 'success');
-      if (count > 0 && S.view === 'leads') window._app?.navigate?.('leads');
+      window._app?.navigate?.('leads');
     } catch { showFileError('No pude leer ese archivo. Verifica que sea .xlsx válido.','😬'); }
   };
   reader.readAsArrayBuffer(file);
