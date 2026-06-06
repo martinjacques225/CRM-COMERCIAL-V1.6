@@ -6,10 +6,11 @@ import { sales } from '../services/sales.service.js';
 import { calcTotalMedallas, calcNivel } from '../services/medal.service.js';
 import { MASCOTAS, getMascotMsg } from './mascotas.js';
 import { S } from './state.js';
-import { todayStr, nowTimeStr, escHtml, avatarColor, getInitials, toast, vibrate, formatDateLong } from './utils.js';
+import { todayStr, nowTimeStr, escHtml, avatarColor, getInitials, toast, vibrate, formatDateLong, nivelInfo } from './utils.js';
 
 // ═══ ICONS ═══ (centralizado aquí desde Etapa 4)
 export const ico = {
+  home:      `<svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>`,
   calendar:  `<svg viewBox="0 0 20 20" fill="currentColor"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/></svg>`,
   list:      `<svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/></svg>`,
   chart:     `<svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>`,
@@ -60,9 +61,11 @@ export async function renderNav() {
     nivel = calcNivel(totalMed); medEnNivel = totalMed % 5;
   } catch {}
   const subtitulo = [cargo || mascota.nombre, equipo || filial].filter(Boolean).join(' · ');
+  const nivelN    = nivelInfo(nivel);
+  const lastBackup = await config.get('lastBackup');
 
   const sections  = [
-    { label:'COMERCIAL',  items:[{id:'dashboard',label:'Dashboard',icon:ico.grid},{id:'agenda',label:'Agenda',icon:ico.calendar},{id:'leads',label:'Leads',icon:ico.people},{id:'whatsapp',label:'Plantillas WhatsApp',icon:ico.whatsapp}] },
+    { label:'COMERCIAL',  items:[{id:'home',label:'Home',icon:ico.home},{id:'dashboard',label:'Dashboard',icon:ico.grid},{id:'agenda',label:'Agenda',icon:ico.calendar},{id:'leads',label:'Leads',icon:ico.people},{id:'whatsapp',label:'Plantillas WhatsApp',icon:ico.whatsapp}] },
     { label:'RENDIMIENTO',items:[{id:'mis_ventas',label:'Mis ventas',icon:ico.chart},{id:'calculadora',label:'Comisiones',icon:ico.money},{id:'medallas',label:'Medallas',icon:ico.medal}] },
     { label:'SISTEMA',    items:[{id:'respaldos',label:'Respaldos',icon:ico.backup},{id:'config',label:'Configuración',icon:ico.settings}] }
   ];
@@ -79,11 +82,11 @@ export async function renderNav() {
         <div class="nav-user-role">${escHtml(subtitulo)}</div>
       </div>
     </div>
-    <div class="nav-level" onclick="window._app?.navigate?.('medallas')">
+    <div class="nav-level" onclick="window._app?.navigate?.('medallas')" title="Nivel actual">
       <div class="nav-level-top">
-        <span class="nav-level-medal">${ico.medal}</span>
+        <span class="nav-level-medal" style="background:linear-gradient(135deg, ${nivelN.color}, ${nivelN.color}cc)">${ico.medal}</span>
         <div class="nav-level-info">
-          <div class="nav-level-name">Nivel ${nivel}</div>
+          <div class="nav-level-name">${nivelN.nombre}</div>
           <div class="nav-level-sub">${medEnNivel} de 5 medallas</div>
         </div>
       </div>
@@ -92,26 +95,39 @@ export async function renderNav() {
     ${sections.map(sec => `
       <div class="nav-section">
         <div class="nav-section-label">${sec.label}</div>
-        ${sec.items.map(i => `<button class="nav-item${S.view===i.id?' active':''}" data-view="${i.id}">${i.icon}<span>${i.label}</span></button>`).join('')}
+        ${sec.items.map(i => `<button class="nav-item${S.view===i.id?' active':''}" data-view="${i.id}" title="${i.label}" aria-label="${i.label}">${i.icon}<span>${i.label}</span></button>`).join('')}
       </div>`).join('')}
     <div class="nav-footer">
-      <div class="nav-status"><span class="nav-status-dot"></span><div><div class="nav-status-on">Conectado</div><div class="nav-status-sub">Sincronizado</div></div></div>
-      <button class="nav-install-btn" id="installBtn" style="${S.deferredInstall?'':'display:none'}">${ico.install}<span>Instalar app</span></button>
+      <div class="nav-status"><span class="nav-status-dot"></span><div><div class="nav-status-on">Sincronizado</div><div class="nav-status-sub">${lastBackup ? 'Último respaldo: ' + _backupLabel(lastBackup) : 'Sin respaldos aún'}</div></div></div>
+      <button class="nav-install-btn" id="backupBtn"><span>Ver respaldos</span></button>
+      <button class="nav-install-btn" id="installBtn" style="${S.deferredInstall?'margin-top:6px':'display:none'}">${ico.install}<span>Instalar app</span></button>
     </div>`;
   document.getElementById('nav').querySelectorAll('.nav-item').forEach(btn => {
     btn.addEventListener('click', () => window._app?.navigate?.(btn.dataset.view));
   });
   document.getElementById('installBtn')?.addEventListener('click', installPWA);
+  document.getElementById('backupBtn')?.addEventListener('click', () => window._app?.navigate?.('respaldos'));
+}
+
+// Etiqueta amigable para el último respaldo ("Hoy 11:30", "Ayer 09:12", "12 Jun")
+function _backupLabel(iso) {
+  if (!iso) return '';
+  const d = new Date(iso), hoy = todayStr(), ds = d.toISOString().slice(0, 10);
+  const hm = d.toTimeString().slice(0, 5);
+  if (ds === hoy) return `Hoy ${hm}`;
+  const ayer = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  if (ds === ayer) return `Ayer ${hm}`;
+  return d.toLocaleDateString('es', { day: 'numeric', month: 'short' });
 }
 
 export function renderBottomNav() {
   const items = [
-    {id:'agenda',label:'Agenda',icon:ico.calendar},{id:'leads',label:'Leads',icon:ico.people},
-    {id:'calculadora',label:'Comisión',icon:ico.money},{id:'dashboard',label:'Stats',icon:ico.chart},
+    {id:'home',label:'Home',icon:ico.home},{id:'agenda',label:'Agenda',icon:ico.calendar},
+    {id:'leads',label:'Leads',icon:ico.people},{id:'calculadora',label:'Comisión',icon:ico.money},
     {id:'config',label:'Config',icon:ico.settings}
   ];
   document.getElementById('bottom-nav').innerHTML = items.map(i =>
-    `<button class="bottom-nav-item${S.view===i.id?' active':''}" data-view="${i.id}">${i.icon}<span>${i.label}</span></button>`
+    `<button class="bottom-nav-item${S.view===i.id?' active':''}" data-view="${i.id}" aria-label="${i.label}">${i.icon}<span>${i.label}</span></button>`
   ).join('');
   document.getElementById('bottom-nav').querySelectorAll('.bottom-nav-item').forEach(btn => {
     btn.addEventListener('click', () => { vibrate(30); window._app?.navigate?.(btn.dataset.view); });
@@ -122,16 +138,16 @@ export function renderTopbar(addDaysFn, refreshViewFn, openFormModalFn, openLead
   const tb = document.getElementById('topbar');
   if (S.view === 'agenda') {
     tb.innerHTML = `
-      <button class="btn-icon" id="prevDay">${ico.chevLeft}</button>
+      <button class="btn-icon" id="prevDay" aria-label="Día anterior">${ico.chevLeft}</button>
       <div class="topbar-date-nav"><div class="date-display">${_formatDateLong(S.date)}</div></div>
-      <button class="btn-icon" id="nextDay">${ico.chevRight}</button>
+      <button class="btn-icon" id="nextDay" aria-label="Día siguiente">${ico.chevRight}</button>
       <button class="btn-today">Hoy</button>
       <button class="btn-primary" id="btnNewAppt">${ico.plus}<span>Nueva cita</span></button>`;
     document.getElementById('prevDay').addEventListener('click',   () => { S.date = addDaysFn(S.date,-1); refreshViewFn(); });
     document.getElementById('nextDay').addEventListener('click',   () => { S.date = addDaysFn(S.date, 1); refreshViewFn(); });
     document.querySelector('.btn-today').addEventListener('click', () => { S.date = todayStr(); refreshViewFn(); });
     document.getElementById('btnNewAppt').addEventListener('click', () => openFormModalFn());
-  } else if (S.view === 'dashboard') {
+  } else if (S.view === 'dashboard' || S.view === 'home') {
     const hh = new Date().getHours();
     const saludo = hh < 12 ? 'Buenos días' : hh < 19 ? 'Buenas tardes' : 'Buenas noches';
     tb.innerHTML = `
@@ -188,7 +204,7 @@ export function attachCardEvents() {
 
 // ═══ MASCOTA ═══
 const VIEW_CTX = {
-  agenda: 'ver_agenda', leads: 'ver_leads', dashboard: 'ver_dashboard',
+  home: 'ver_dashboard', agenda: 'ver_agenda', leads: 'ver_leads', dashboard: 'ver_dashboard',
   mis_ventas: 'ver_ventas', whatsapp: 'ver_agenda', config: 'ver_config',
   calculadora: 'tip_comercial', medallas: 'tip_comercial',
   respaldos: 'tip_comercial'

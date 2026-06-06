@@ -1,4 +1,4 @@
-const CACHE = 'crm-v9';
+const CACHE = 'crm-v10';
 const ASSETS = [
   // Shell
   './index.html',
@@ -21,12 +21,15 @@ const ASSETS = [
   './services/appointment.service.js',
   './services/sales.service.js',
   './services/call.service.js',
+  './services/event.service.js',
   './services/template.service.js',
   './services/config.service.js',
   './services/commission.service.js',
   './services/medal.service.js',
   './services/user.service.js',
   // Módulos de vista
+  './modules/home/home.js',
+  './modules/home/home.css',
   './modules/agenda/agenda.js',
   './modules/calculadora/calculadora.js',
   './modules/configuracion/configuracion.js',

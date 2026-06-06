@@ -14,6 +14,7 @@ import { ico, renderNav, renderBottomNav, renderTopbar, attachCardEvents,
          requestNotifications, startNotificationWatcher, installPWA } from './js/ui.js';
 
 // ── Módulos de vista ──
+import * as ModHome      from './modules/home/home.js';
 import * as ModAgenda    from './modules/agenda/agenda.js';
 import * as ModLeads     from './modules/leads/leads.js';
 import * as ModVentas    from './modules/ventas/ventas.js';
@@ -37,11 +38,11 @@ export function navigate(view) {
   renderTopbar(addDays, refreshView, openFormModal, openLeadModal, openSaleModal);
   renderBottomNav();
   refreshCenter();
-  showMascotForView(view);
 }
 
 async function refreshCenter() {
   const map = {
+    home:        ModHome.render,
     agenda:      ModAgenda.render,
     leads:       ModLeads.render,
     whatsapp:    ModWhatsapp.render,
@@ -53,7 +54,8 @@ async function refreshCenter() {
     config:      ModConfig.render
   };
   if (map[S.view]) await map[S.view]();
-  if (S.view === 'dashboard') await ModDashboard.renderPanel();
+  if (S.view === 'home') await ModHome.renderPanel();
+  else if (S.view === 'dashboard') await ModDashboard.renderPanel();
   else await ModAgenda.renderPanel();
 }
 
@@ -99,8 +101,8 @@ async function init() {
   await renderNav();
   renderTopbar(addDays, refreshView, openFormModal, openLeadModal, openSaleModal);
   renderBottomNav();
-  await ModAgenda.render();
-  await ModAgenda.renderPanel();
+  await ModHome.render();
+  await ModHome.renderPanel();
 
   // Eventos de modales globales
   document.getElementById('modalOverlay').addEventListener('click', e => {
@@ -121,7 +123,6 @@ async function init() {
   // Notificaciones y mascota
   await requestNotifications();
   startNotificationWatcher(appointments);
-  startMascotTips();
   await checkMascotRegreso();
   if (!await config.get('lastVisit')) setTimeout(() => showMascotMessage(null, 'bienvenida', true), 1500);
 }

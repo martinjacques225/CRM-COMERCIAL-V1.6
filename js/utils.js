@@ -186,6 +186,46 @@ export function calcTotalMedallas(allSales) {
   return Object.values(g).reduce((acc, ws) => acc + calcMedallasSemanales(ws), 0);
 }
 export function calcNivel(totalMedallas) { return Math.floor(totalMedallas / 5); }
+
+// ── Nombre de nivel (cosmético) — Bronze/Silver/Gold/Platino/Diamante × I-III ──
+const _TIERS = [
+  { nombre: 'Bronze',   color: '#B45309' },
+  { nombre: 'Silver',   color: '#64748B' },
+  { nombre: 'Gold',     color: '#D97706' },
+  { nombre: 'Platino',  color: '#0EA5E9' },
+  { nombre: 'Diamante', color: '#8B5CF6' }
+];
+const _ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+export function nivelInfo(nivel = 0) {
+  const idx = Math.min(Math.floor(nivel / 3), _TIERS.length - 1);
+  const tier = _TIERS[idx];
+  const sub = idx === _TIERS.length - 1 ? nivel - idx * 3 : nivel % 3; // Diamante sigue subiendo
+  return { tier: tier.nombre, color: tier.color, sub: _ROMAN[Math.min(sub, _ROMAN.length - 1)],
+           nombre: `${tier.nombre} ${_ROMAN[Math.min(sub, _ROMAN.length - 1)]}` };
+}
+
+// ── Mejor día de la semana (por nº de ventas) ──
+export function mejorDiaSemana(allSales, weekStart) {
+  const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+  let best = { dia: null, cierres: 0 };
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(weekStart, i);
+    const n = allSales.filter(s => s.fecha === d).length;
+    if (n > best.cierres) best = { dia: dias[i], cierres: n };
+  }
+  return best;
+}
+
+// ── Leads calientes: Seguimiento/Propuesta enviada con actividad ≤ N días ──
+export function leadsCalientes(allLeads, dias = 5) {
+  const limite = Date.now() - dias * 86400000;
+  const calientes = ['Seguimiento', 'Propuesta enviada'];
+  return (allLeads || []).filter(l => {
+    if (!calientes.includes(l.estado)) return false;
+    const ref = l.fechaActualizacion || l.fechaCreacion;
+    return ref ? new Date(ref).getTime() >= limite : false;
+  });
+}
 export function calcMonthComision(allSales, year, month, debutActivo = false, PLANES = []) {
   const prefix  = `${year}-${String(month).padStart(2, '0')}`;
   const thisMo  = allSales.filter(s => s.fecha.startsWith(prefix));
