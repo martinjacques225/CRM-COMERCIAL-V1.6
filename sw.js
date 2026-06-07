@@ -1,8 +1,9 @@
-const CACHE = 'crm-v12';
+const CACHE = 'crm-v13';
 const ASSETS = [
   // Shell
   './index.html',
   './styles.css',
+  './fase1-rediseno.css',
   './manifest.json',
   // Core JS
   './app.js',
