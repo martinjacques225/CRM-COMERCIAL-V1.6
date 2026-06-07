@@ -28,6 +28,7 @@ body { font-size: 1rem; line-height: 1.5; letter-spacing: -.003em; }
   --text3: #AEB6C2;
   --nav-text: #E6EDF3;
   --nav-text-label: #8B95A1;
+  --nav-hover: #21262D;      /* faltaba: el hover/selección del nav se veía blanco */
   --border: #2A3340;
   --border-soft: #232B36;
 }
@@ -58,11 +59,11 @@ body { font-size: 1rem; line-height: 1.5; letter-spacing: -.003em; }
   font-size: 1.375rem; line-height: 1.2; letter-spacing: -.015em; font-weight: 800;
 }
 
-/* 3e. KPIs principales — 36–48px */
-.kpi-val { font-size: 2.5rem; line-height: 1.04; letter-spacing: -.025em; }  /* 40px */
-/* KPIs secundarios / cifras de apoyo (legibles, sin invadir el rango principal) */
-.hm-stat-val { font-size: 1.75rem; }              /* 28px */
-.hm-mini-val, .pc-proj { font-size: 1.625rem; }   /* 26px */
+/* 3e. KPIs principales — tamaño contenido para no opacar la info de apoyo */
+.kpi-val { font-size: 1.875rem; line-height: 1.08; letter-spacing: -.02em; }  /* 30px */
+/* KPIs secundarios / cifras de apoyo */
+.hm-stat-val { font-size: 1.625rem; }             /* 26px */
+.hm-mini-val, .pc-proj { font-size: 1.5rem; }     /* 24px */
 .donut-pct { font-size: 30px; }
 .donut-lbl { font-size: 14px; }
 
@@ -139,7 +140,7 @@ body { font-size: 1rem; line-height: 1.5; letter-spacing: -.003em; }
 /* ── 9. RESPONSIVE — mantener mínimos sin romper densidad móvil ── */
 @media (max-width: 768px) {
   #center { padding: 16px; padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom) + 12px); }
-  .kpi-val { font-size: 2.25rem; }      /* 36px (mínimo del rango) */
+  .kpi-val { font-size: 1.75rem; }      /* 28px en móvil */
   .card-title, .hm-mission-title, .tb-greet-title { font-size: 1.25rem; }  /* 20px en móvil */
   .bottom-nav-item { font-size: .8125rem; }  /* 13px etiquetas de barra inferior (excepción de densidad) */
 }
@@ -147,3 +148,25 @@ body { font-size: 1rem; line-height: 1.5; letter-spacing: -.003em; }
   /* nav colapsado: el texto se oculta, no afecta a los mínimos */
   .nav-item { justify-content: center; }
 }
+
+/* ── 10. MODO OSCURO — botones de acción de leads/agenda (antes casi invisibles) ── */
+/* Las variantes usaban fondos claros fijos (#F0FDF4…) que se perdían sobre tarjetas oscuras. */
+[data-theme="dark"] .btn-action {
+  background: var(--surface3); border-color: #3A4452; color: var(--text);
+}
+[data-theme="dark"] .btn-action:hover { background: #2A3340; }
+[data-theme="dark"] .btn-action.green {
+  background: rgba(34,197,94,.18); border-color: rgba(34,197,94,.50); color: #4ADE80;
+}
+[data-theme="dark"] .btn-action.green:hover { background: rgba(34,197,94,.28); }
+[data-theme="dark"] .btn-action.blue {
+  background: rgba(77,142,255,.18); border-color: rgba(77,142,255,.50); color: #7FB0FF;
+}
+[data-theme="dark"] .btn-action.blue:hover { background: rgba(77,142,255,.28); }
+[data-theme="dark"] .btn-action.primary {
+  background: var(--primary); border-color: var(--primary); color: #fff;
+}
+[data-theme="dark"] .btn-action.danger {
+  background: rgba(239,68,68,.18); border-color: rgba(239,68,68,.50); color: #FCA5A5;
+}
+[data-theme="dark"] .btn-action.danger:hover { background: rgba(239,68,68,.28); }
