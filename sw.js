@@ -1,4 +1,4 @@
-const CACHE = 'crm-v14';
+const CACHE = 'crm-v15';
 const ASSETS = [
   // Shell
   './index.html',
@@ -41,6 +41,7 @@ const ASSETS = [
   './modules/modals/modal-core.js',
   './modules/modals/modal-cita.js',
   './modules/modals/modal-lead.js',
+  './modules/modals/modal-lead-detail.js',
   './modules/modals/modal-venta.js',
   './modules/modals/modal-wa.js',
   './modules/plantillas-wa/whatsapp.js',

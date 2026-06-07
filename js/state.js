@@ -19,5 +19,9 @@ export const S = {
   calcBeca:       false,
   calcTab:        'rapida',   // 'rapida' | 'simulador'
   simDebut:       false,      // bono debut activo en la simulación
-  simGrid:        null        // grilla de ventas por semana (lazy init en el módulo)
+  simGrid:        null,       // grilla de ventas por semana (lazy init en el módulo)
+  // Fase 2
+  agendaView:     'agenda',   // 'agenda' | 'calendario'
+  calMonth:       null,       // 'YYYY-MM' para la vista calendario (lazy init)
+  leadDetailId:   null        // lead abierto en la ficha lateral
 };

@@ -159,3 +159,79 @@
 .apt-menu-item.danger:hover { background: var(--danger-bg); }
 .apt-menu-item svg { width: 14px; height: 14px; flex-shrink: 0; }
 
+
+/* ═══ FASE 2 — Toggle Agenda/Calendario ═══ */
+.agenda-view-toggle { display: flex; gap: 6px; margin-bottom: 14px; }
+.av-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--text2); font-size: .8rem; font-weight: 600;
+  font-family: var(--font); cursor: pointer; transition: all var(--transition);
+}
+.av-btn svg { width: 15px; height: 15px; }
+.av-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+/* ═══ Ficha resumen de cita ═══ */
+.apt-ficha {
+  margin: 6px 0 2px; padding: 8px 10px;
+  background: var(--surface2); border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+}
+.apt-ficha-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 5px; }
+.ficha-tag {
+  font-size: .68rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+  background: var(--primary-light); color: var(--primary-dark);
+}
+.ficha-nivel { background: #DCFCE7; color: #15803D; }
+.apt-ficha-line { font-size: .74rem; color: var(--text2); line-height: 1.5; }
+.apt-ficha-line b { color: var(--text); font-weight: 700; }
+
+/* ═══ Horarios disponibles (panel lateral) ═══ */
+.slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+.slot {
+  font-size: .72rem; font-weight: 600; text-align: center; padding: 6px 2px;
+  border-radius: var(--radius-xs); font-family: var(--font);
+}
+.slot-free {
+  background: var(--surface); border: 1px solid var(--border); color: var(--text2);
+  cursor: pointer; transition: all var(--transition);
+}
+.slot-free:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+.slot-taken {
+  background: var(--surface3); border: 1px solid transparent; color: var(--text3);
+  text-decoration: line-through; cursor: not-allowed;
+}
+
+/* ═══ Vista Calendario ═══ */
+.cal-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.cal-month { font-size: .95rem; font-weight: 800; color: var(--text); text-transform: capitalize; }
+.cal-nav {
+  width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font-size: 1.25rem; line-height: 1;
+  cursor: pointer; transition: all var(--transition);
+}
+.cal-nav:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-dow { margin-bottom: 4px; }
+.cal-dow-cell { text-align: center; font-size: .68rem; font-weight: 700; color: var(--text3); padding: 2px 0; }
+.cal-cell {
+  position: relative; aspect-ratio: 1 / 1; min-height: 40px;
+  border: 1px solid var(--border-soft); border-radius: var(--radius-xs);
+  background: var(--surface); cursor: pointer; font-family: var(--font);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  transition: all var(--transition);
+}
+.cal-cell:hover { border-color: var(--primary); }
+.cal-empty { background: transparent; border: none; cursor: default; }
+.cal-num { font-size: .82rem; font-weight: 600; color: var(--text); }
+.cal-has { background: var(--primary-light); }
+.cal-dot {
+  font-size: .6rem; font-weight: 800; color: #fff; background: var(--primary);
+  min-width: 16px; height: 16px; border-radius: 999px; padding: 0 4px;
+  display: flex; align-items: center; justify-content: center;
+}
+.cal-today { border-color: var(--primary); border-width: 2px; }
+.cal-sel { background: var(--primary); }
+.cal-sel .cal-num { color: #fff; }
+.cal-sel .cal-dot { background: #fff; color: var(--primary); }

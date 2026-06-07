@@ -63,7 +63,7 @@ function _buildGrid(list) {
     <div class="lead-card${l.agendado?' lead-agendado':''}">
       <div class="lead-card-header">
         ${avatarHtml(l.nombre,l.apellido,l.avatar,36)}
-        <div class="lead-info"><div class="lead-name">${escHtml((l.nombre||'')+' '+(l.apellido||''))}</div><div class="lead-sub">${escHtml(l.empresa||l.cargo||'-')}</div></div>
+        <div class="lead-info lead-name-link" data-action="view-lead" data-id="${l.id}" title="Ver ficha"><div class="lead-name">${escHtml((l.nombre||'')+' '+(l.apellido||''))}</div><div class="lead-sub">${escHtml(l.areaLaboral||l.empresa||l.cargo||'-')}${l.nivelIngles?` · ${escHtml(l.nivelIngles)}`:''}</div></div>
         <span class="${statusBadgeClass(l.estado)}">${escHtml(l.estado)}</span>
       </div>
       <div class="lead-card-body">
@@ -73,7 +73,7 @@ function _buildGrid(list) {
       </div>
       <div class="lead-card-footer">
         <div class="lead-actions">
-          ${l.telefono?`<button class="btn-action green" data-action="call" data-id="${l.id}" data-tel="${escHtml(l.telefono)}" data-nombre="${escHtml(l.nombre||'')}">${_ico.phone}</button>`:''}
+          ${l.telefono?`<button class="btn-action green" data-action="call" data-id="${l.id}" data-type="lead" data-tel="${escHtml(l.telefono)}" data-nombre="${escHtml(l.nombre||'')}">${_ico.phone}</button>`:''}
           ${l.telefono?`<button class="btn-action green" data-action="wa"   data-id="${l.id}" data-type="lead">${_ico.whatsapp}</button>`:''}
           <button class="btn-action blue"    data-action="agendar-lead" data-id="${l.id}">${_ico.calendar} Agendar</button>
           <button class="btn-action primary" data-action="edit-lead"    data-id="${l.id}">${_ico.edit}</button>
@@ -91,10 +91,10 @@ function _buildKanban(list) {
     return `<div class="kanban-col">
       <div class="kanban-col-header"><span class="kanban-col-title">${col}</span><span class="kanban-count">${items.length}</span></div>
       <div class="kanban-cards">${items.map(l=>`<div class="kanban-card">
-        <div class="kanban-card-name">${escHtml((l.nombre||'')+' '+(l.apellido||''))}</div>
-        <div class="kanban-card-sub">${escHtml(l.interes||l.empresa||'-')}</div>
+        <div class="kanban-card-name lead-name-link" data-action="view-lead" data-id="${l.id}" title="Ver ficha">${escHtml((l.nombre||'')+' '+(l.apellido||''))}</div>
+        <div class="kanban-card-sub">${escHtml(l.interes||l.areaLaboral||l.empresa||'-')}</div>
         <div class="kanban-card-actions">
-          ${l.telefono?`<button class="btn-action green" data-action="call" data-id="${l.id}" data-tel="${escHtml(l.telefono)}" data-nombre="${escHtml(l.nombre||'')}">${_ico.phone}</button>`:''}
+          ${l.telefono?`<button class="btn-action green" data-action="call" data-id="${l.id}" data-type="lead" data-tel="${escHtml(l.telefono)}" data-nombre="${escHtml(l.nombre||'')}">${_ico.phone}</button>`:''}
           <button class="btn-action blue"    data-action="agendar-lead" data-id="${l.id}">${_ico.calendar}</button>
           <button class="btn-action primary" data-action="edit-lead"    data-id="${l.id}">${_ico.edit}</button>
         </div>

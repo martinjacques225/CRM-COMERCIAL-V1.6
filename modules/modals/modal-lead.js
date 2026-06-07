@@ -1,6 +1,6 @@
 // modules/modals/modal-lead.js — Modal de Lead (nuevo/editar) y eliminación de lead
 import { leads } from '../../services/lead.service.js';
-import { LEAD_ESTADOS } from '../../js/estados.js';
+import { LEAD_ESTADOS, NIVELES_INGLES, PRIORIDADES, ORIGENES } from '../../js/estados.js';
 import { S } from '../../js/state.js';
 import { escHtml, toast } from '../../js/utils.js';
 import { openModal, closeModal } from './modal-core.js';
@@ -20,22 +20,28 @@ export async function openLeadModal(id = null) {
       <div class="form-field"><label class="form-label">Email</label><input class="form-input" id="lEmail" type="email" value="${escHtml(lead?.email||'')}"></div>
     </div>
     <div class="form-row">
-      <div class="form-field"><label class="form-label">Empresa</label><input class="form-input" id="lEmpresa" value="${escHtml(lead?.empresa||'')}"></div>
-      <div class="form-field"><label class="form-label">Cargo</label><input class="form-input" id="lCargo" value="${escHtml(lead?.cargo||'')}"></div>
+      <div class="form-field"><label class="form-label">Área laboral</label><input class="form-input" id="lArea" value="${escHtml(lead?.areaLaboral||'')}" placeholder="Ej: Ingeniería, Salud..."></div>
+      <div class="form-field"><label class="form-label">Nivel de inglés</label>
+        <select class="form-select" id="lNivelIngles"><option value="">Sin evaluar</option>${NIVELES_INGLES.map(v=>`<option${lead?.nivelIngles===v?' selected':''}>${v}</option>`).join('')}</select>
+      </div>
     </div>
     <div class="form-row">
       <div class="form-field"><label class="form-label">Interés</label><input class="form-input" id="lInteres" value="${escHtml(lead?.interes||'')}"></div>
-      <div class="form-field"><label class="form-label">Origen</label>
-        <select class="form-select" id="lOrigen"><option value="">Sin especificar</option>${['Facebook','Instagram','LinkedIn','Referido','Web','Cold Call','Otro'].map(v=>`<option${lead?.origen===v?' selected':''}>${v}</option>`).join('')}</select>
+      <div class="form-field"><label class="form-label">Origen del dato</label>
+        <select class="form-select" id="lOrigen"><option value="">Sin especificar</option>${ORIGENES.map(v=>`<option${lead?.origen===v?' selected':''}>${v}</option>`).join('')}</select>
       </div>
     </div>
     <div class="form-row">
       <div class="form-field"><label class="form-label">Estado</label>
         <select class="form-select" id="lEstado">${LEAD_ESTADOS.map(e=>`<option${lead?.estado===e?' selected':''}>${e}</option>`).join('')}</select>
       </div>
-      <div class="form-field"><label class="form-label">Nivel de interés</label>
-        <select class="form-select" id="lNivel">${['','Alto','Medio','Bajo'].map(v=>`<option${lead?.nivelInteres===v?' selected':''}>${v}</option>`).join('')}</select>
+      <div class="form-field"><label class="form-label">Prioridad</label>
+        <select class="form-select" id="lPrioridad"><option value="">Sin prioridad</option>${PRIORIDADES.map(v=>`<option${lead?.prioridad===v?' selected':''}>${v}</option>`).join('')}</select>
       </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field"><label class="form-label">Empresa</label><input class="form-input" id="lEmpresa" value="${escHtml(lead?.empresa||'')}"></div>
+      <div class="form-field"><label class="form-label">Cargo</label><input class="form-input" id="lCargo" value="${escHtml(lead?.cargo||'')}"></div>
     </div>
     <div class="form-row full"><div class="form-field"><label class="form-label">Observaciones</label><textarea class="form-textarea" id="lObs">${escHtml(lead?.observaciones||'')}</textarea></div></div>`;
   openModal();
@@ -47,12 +53,14 @@ export async function openLeadModal(id = null) {
       apellido:     document.getElementById('lApellido').value.trim(),
       telefono:     document.getElementById('lTel').value.trim(),
       email:        document.getElementById('lEmail').value.trim(),
+      areaLaboral:  document.getElementById('lArea').value.trim(),
+      nivelIngles:  document.getElementById('lNivelIngles').value,
       empresa:      document.getElementById('lEmpresa').value.trim(),
       cargo:        document.getElementById('lCargo').value.trim(),
       interes:      document.getElementById('lInteres').value.trim(),
       origen:       document.getElementById('lOrigen').value,
       estado:       nuevoEstado,
-      nivelInteres: document.getElementById('lNivel').value,
+      prioridad:    document.getElementById('lPrioridad').value,
       observaciones:document.getElementById('lObs').value.trim()
     };
     if (isEdit) {

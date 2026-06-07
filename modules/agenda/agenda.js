@@ -23,6 +23,18 @@ const _ico = {
 
 export async function render() {
   const center  = document.getElementById('center');
+  const toggle  = _viewToggle();
+
+  // ── Vista Calendario (tipo Google Calendar) ──
+  if (S.agendaView === 'calendario') {
+    center.innerHTML = `<div class="view-animate">${toggle}${await _buildCalendar()}</div>`;
+    center.style.position = 'relative';
+    _wireToggle();
+    _wireCalendar();
+    return;
+  }
+
+  // ── Vista Agenda (lista del día) ──
   const appts   = await appointments.getByDate(S.date);
   appts.sort((a, b) => a.hora.localeCompare(b.hora));
   const isToday = S.date === todayStr();
@@ -42,12 +54,75 @@ export async function render() {
     }).join('')}${!nowDone ? `<div class="apt-now"><span>Ahora · ${nowStr}</span></div>` : ''}</div>`;
   }
 
-  center.innerHTML = `<div class="view-animate">${top}${listHtml}</div>`;
+  center.innerHTML = `<div class="view-animate">${toggle}${top}${listHtml}</div>`;
   center.style.position = 'relative';
   window._app?.attachCardEvents?.();
   document.querySelectorAll('[data-goleads]').forEach(el =>
     el.addEventListener('click', () => window._app?.navigate?.('leads')));
+  _wireToggle();
   _wireMenus();
+}
+
+// Conmutador Agenda / Calendario
+function _viewToggle() {
+  return `<div class="agenda-view-toggle">
+    <button class="av-btn${S.agendaView !== 'calendario' ? ' active' : ''}" data-av="agenda">${_ico.list} Agenda</button>
+    <button class="av-btn${S.agendaView === 'calendario' ? ' active' : ''}" data-av="calendario">${_ico.calendar} Calendario</button>
+  </div>`;
+}
+function _wireToggle() {
+  document.querySelectorAll('.av-btn').forEach(b =>
+    b.addEventListener('click', () => { S.agendaView = b.dataset.av; render(); window._app?.refreshView?.(); }));
+}
+
+// Grilla mensual con citas por día
+async function _buildCalendar() {
+  const month = S.calMonth || S.date.slice(0, 7);
+  S.calMonth = month;
+  const [y, m] = month.split('-').map(Number);
+  const all = await appointments.getAll();
+  const counts = {};
+  all.forEach(a => { if (a.estado !== 'Reagendada') counts[a.fecha] = (counts[a.fecha] || 0) + 1; });
+
+  const first = new Date(y, m - 1, 1);
+  const startCol = (first.getDay() + 6) % 7;            // lunes = 0
+  const daysInMonth = new Date(y, m, 0).getDate();
+  const monthName = first.toLocaleDateString('es', { month: 'long', year: 'numeric' });
+  const dias = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+  const today = todayStr();
+
+  let cells = '';
+  for (let i = 0; i < startCol; i++) cells += `<div class="cal-cell cal-empty"></div>`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const fecha = `${month}-${String(d).padStart(2, '0')}`;
+    const n = counts[fecha] || 0;
+    const cls = [fecha === today ? 'cal-today' : '', fecha === S.date ? 'cal-sel' : '', n ? 'cal-has' : ''].join(' ').trim();
+    cells += `<button class="cal-cell ${cls}" data-fecha="${fecha}">
+      <span class="cal-num">${d}</span>
+      ${n ? `<span class="cal-dot">${n}</span>` : ''}
+    </button>`;
+  }
+
+  return `<div class="cal-wrap">
+    <div class="cal-header">
+      <button class="cal-nav" data-cal="prev">‹</button>
+      <span class="cal-month">${monthName}</span>
+      <button class="cal-nav" data-cal="next">›</button>
+    </div>
+    <div class="cal-grid cal-dow">${dias.map(d => `<div class="cal-dow-cell">${d}</div>`).join('')}</div>
+    <div class="cal-grid">${cells}</div>
+  </div>`;
+}
+function _wireCalendar() {
+  document.querySelectorAll('.cal-nav').forEach(b => b.addEventListener('click', () => {
+    const [y, m] = (S.calMonth || S.date.slice(0, 7)).split('-').map(Number);
+    const d = new Date(y, m - 1 + (b.dataset.cal === 'next' ? 1 : -1), 1);
+    S.calMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    render();
+  }));
+  document.querySelectorAll('.cal-cell[data-fecha]').forEach(c => c.addEventListener('click', () => {
+    S.date = c.dataset.fecha; S.agendaView = 'agenda'; render(); window._app?.refreshView?.();
+  }));
 }
 
 // Menú "⋯" de acciones secundarias por tarjeta.
@@ -117,6 +192,20 @@ function _countdown(nowStr, horaStr) {
   return `en ${h}h${m ? ` ${m}m` : ''}`;
 }
 
+// Ficha resumen de la cita — visible directamente sin abrir la ficha.
+function _buildFicha(a) {
+  const rows = [];
+  if (a.areaLaboral) rows.push(`<span class="ficha-tag">${escHtml(a.areaLaboral)}</span>`);
+  if (a.nivelIngles) rows.push(`<span class="ficha-tag ficha-nivel">${escHtml(a.nivelIngles)}</span>`);
+  const tags = rows.length ? `<div class="apt-ficha-tags">${rows.join('')}</div>` : '';
+  const lineas = [];
+  if (a.interes)      lineas.push(`<div class="apt-ficha-line"><b>Interés:</b> ${escHtml(a.interes)}</div>`);
+  if (a.necesidades)  lineas.push(`<div class="apt-ficha-line"><b>Necesidades:</b> ${escHtml(a.necesidades)}</div>`);
+  if (a.observaciones)lineas.push(`<div class="apt-ficha-line"><b>Obs:</b> ${escHtml(a.observaciones)}</div>`);
+  if (!tags && !lineas.length) return '';
+  return `<div class="apt-ficha">${tags}${lineas.join('')}</div>`;
+}
+
 function _buildCard(a) {
   return `<div class="apt-card" data-estado="${escHtml(a.estado)}" data-id="${a.id}">
     <div class="apt-time-chip">${a.hora}</div>
@@ -126,10 +215,10 @@ function _buildCard(a) {
         <span class="apt-card-status"><span class="${statusBadgeClass(a.estado)}">${escHtml(a.estado)}</span></span>
       </div>
       <div class="apt-card-meta">
-        ${a.interes    ? `<span class="apt-meta-item">${_ico.chart}${escHtml(a.interes)}</span>`    : ''}
         ${a.telefono   ? `<span class="apt-meta-item">${_ico.phone}${escHtml(a.telefono)}</span>`   : ''}
         ${a.origenLead ? `<span class="apt-meta-item">${_ico.list}${escHtml(a.origenLead)}</span>`  : ''}
       </div>
+      ${_buildFicha(a)}
       <div class="apt-card-actions">
         ${a.telefono ? `<button class="btn-action green" data-action="call"     data-id="${a.id}" data-tel="${escHtml(a.telefono)}" data-nombre="${escHtml(a.nombre)}">${_ico.phone}Llamar</button>` : ''}
         ${a.telefono ? `<button class="btn-action green" data-action="wa"       data-id="${a.id}" data-type="appt">${_ico.whatsapp}WhatsApp</button>` : ''}
@@ -179,6 +268,10 @@ export async function renderPanel() {
         </div>`).join('')}
     </div>`:''}
     <div class="panel-card">
+      <div class="panel-card-title">Horarios disponibles</div>
+      <div class="slots-grid">${_buildSlots(appts)}</div>
+    </div>
+    <div class="panel-card">
       <div class="panel-card-title">Accesos rápidos</div>
       <button class="btn-secondary" style="width:100%;margin-bottom:6px" id="panelNewAppt">${_ico.plus} Nueva cita</button>
       <button class="btn-secondary" style="width:100%" id="panelCalc">${_ico.money} Calculadora</button>
@@ -186,4 +279,21 @@ export async function renderPanel() {
 
   document.getElementById('panelNewAppt')?.addEventListener('click', () => window._app?.openFormModal?.());
   document.getElementById('panelCalc')?.addEventListener('click',   () => window._app?.navigate?.('calculadora'));
+  panel.querySelectorAll('.slot-free').forEach(b =>
+    b.addEventListener('click', () => window._app?.openFormModal?.(null, { fecha: S.date, hora: b.dataset.hora })));
+}
+
+// Horarios laborales del día (08:00–20:00 cada 30 min): libre u ocupado.
+function _buildSlots(appts) {
+  const taken = {};
+  appts.forEach(a => { if (a.estado !== 'Reagendada') taken[a.hora] = a.nombre; });
+  const slots = [];
+  for (let h = 8; h <= 20; h++) for (let m = 0; m < 60; m += 30) {
+    if (h === 20 && m > 0) break;
+    slots.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+  }
+  return slots.map(s => taken[s]
+    ? `<div class="slot slot-taken" title="${escHtml(taken[s])}">${s}</div>`
+    : `<button class="slot slot-free" data-hora="${s}" title="Agendar a las ${s}">${s}</button>`
+  ).join('');
 }

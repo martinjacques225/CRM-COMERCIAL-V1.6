@@ -27,7 +27,7 @@ import * as ModConfig    from './modules/configuracion/configuracion.js';
 
 // ── Módulo de modales ──
 import { openModal, closeModal,
-         openFormModal, openFormModalFromLead, openLeadModal,
+         openFormModal, openFormModalFromLead, openLeadModal, openLeadDetail,
          openReagendarModal, openWAModal, openSaleModal,
          deleteSale, deleteLead, deleteAppointment, appointmentToLead } from './modules/modals/modals.js';
 
@@ -85,7 +85,7 @@ async function init() {
     renderNav, renderBottomNav, attachCardEvents,
     showMascotMessage,
     // Modales
-    openFormModal, openFormModalFromLead, openLeadModal,
+    openFormModal, openFormModalFromLead, openLeadModal, openLeadDetail,
     openReagendarModal, openWAModal, openSaleModal,
     closeModal,
     // Acciones de datos
