@@ -223,7 +223,7 @@ function _mision(D) {
     { ic: '💰', val: fmtMoney(D.proj), lbl: 'Comisión<br>proyectada' }
   ];
   return `<div class="hm-mission">
-    <div class="hm-mission-head"><span class="hm-mission-ico">${ico.chart}</span><span class="hm-mission-title">Misión del día</span></div>
+    <div class="hm-mission-head"><span class="hm-mission-ico">${ico.chart}</span><span class="hm-mission-title">Programación del día</span></div>
     <div class="hm-mission-body">
       <div class="hm-mission-stats">
         ${stats.map(s => `<div class="hm-stat"><div class="hm-stat-ic">${s.ic}</div><div class="hm-stat-val">${s.val}</div><div class="hm-stat-lbl">${s.lbl}</div></div>`).join('')}
