@@ -1,0 +1,13 @@
+[stdin]:219
+        ${a.
+            
+
+SyntaxError: Unexpected end of input
+    at checkSyntax (node:internal/main/check_syntax:74:5)
+    at node:internal/main/check_syntax:45:5
+    at ReadStream.<anonymous> (node:internal/process/execution:201:5)
+    at ReadStream.emit (node:events:519:28)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+
+Node.js v22.22.0

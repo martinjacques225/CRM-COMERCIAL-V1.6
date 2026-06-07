@@ -11,3 +11,8 @@ export const CARGOS = [
   'Asesor Training', 'Full Executive', 'Jefe de Grupo',
   'Gerente', 'Sales Manager', 'Director', 'CEO'
 ];
+
+// Fase 2 — catálogos comerciales del lead/cita
+export const NIVELES_INGLES = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+export const PRIORIDADES = ['Alta', 'Media', 'Baja'];
+export const ORIGENES = ['Facebook', 'Instagram', 'LinkedIn', 'Referido', 'Web', 'Cold Call', 'Otro'];

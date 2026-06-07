@@ -1,15 +1,18 @@
 // modules/modals/modal-cita.js — Modales de Cita: nueva/editar, desde lead, reagendar
 import { appointments } from '../../services/appointment.service.js';
 import { leads } from '../../services/lead.service.js';
+import { NIVELES_INGLES } from '../../js/estados.js';
 import { S } from '../../js/state.js';
 import { escHtml, formatDate, toast, statusDotColor, avatarHtml, renderTimePicker, initTimePicker } from '../../js/utils.js';
 import { _alert, openModal, closeModal } from './modal-core.js';
 
 // ── Cita ──
-export async function openFormModal(id = null) {
+export async function openFormModal(id = null, preset = null) {
   S.editingId = id;
   let appt = null; if (id) appt = await appointments.get(id);
   const isEdit = !!appt;
+  const presetFecha = preset?.fecha || S.date;
+  const presetHora  = preset?.hora || '09:00';
   document.getElementById('modalTitle').textContent = isEdit ? 'Editar cita' : 'Nueva cita';
   document.getElementById('modalBody').innerHTML = `
     <div class="form-row">
@@ -17,8 +20,8 @@ export async function openFormModal(id = null) {
       <div class="form-field"><label class="form-label">Teléfono <span class="req">*</span></label><input class="form-input" id="fTelefono" value="${escHtml(appt?.telefono||'')}" placeholder="+56 9 ..."><span class="form-error" id="eTelefono"></span></div>
     </div>
     <div class="form-row">
-      <div class="form-field"><label class="form-label">Fecha <span class="req">*</span></label><input class="form-input" id="fFecha" type="date" value="${appt?.fecha||S.date}"></div>
-      <div class="form-field"><label class="form-label">Hora <span class="req">*</span></label>${renderTimePicker('fHora', appt?.hora||'09:00')}</div>
+      <div class="form-field"><label class="form-label">Fecha <span class="req">*</span></label><input class="form-input" id="fFecha" type="date" value="${appt?.fecha||presetFecha}"></div>
+      <div class="form-field"><label class="form-label">Hora <span class="req">*</span></label>${renderTimePicker('fHora', appt?.hora||presetHora)}</div>
     </div>
     <div class="form-row">
       <div class="form-field"><label class="form-label">Interés</label><input class="form-input" id="fInteres" value="${escHtml(appt?.interes||'')}"></div>
@@ -28,9 +31,15 @@ export async function openFormModal(id = null) {
     </div>
     <div class="form-row">
       <div class="form-field"><label class="form-label">Área laboral</label><input class="form-input" id="fAreaLaboral" value="${escHtml(appt?.areaLaboral||'')}"></div>
-      <div class="form-field"><label class="form-label">Duración (min)</label><input class="form-input" id="fDuracion" type="number" value="${appt?.duracion||30}" min="15" max="240" step="15"></div>
+      <div class="form-field"><label class="form-label">Nivel de inglés</label>
+        <select class="form-select" id="fNivelIngles"><option value="">Sin evaluar</option>${NIVELES_INGLES.map(v=>`<option${appt?.nivelIngles===v?' selected':''}>${v}</option>`).join('')}</select>
+      </div>
     </div>
-    <div class="form-row full"><div class="form-field"><label class="form-label">Link Zoom</label><input class="form-input" id="fZoomLink" value="${escHtml(appt?.zoomLink||'')}" placeholder="https://zoom.us/j/..."></div></div>
+    <div class="form-row">
+      <div class="form-field"><label class="form-label">Duración (min)</label><input class="form-input" id="fDuracion" type="number" value="${appt?.duracion||30}" min="15" max="240" step="15"></div>
+      <div class="form-field"><label class="form-label">Link Zoom</label><input class="form-input" id="fZoomLink" value="${escHtml(appt?.zoomLink||'')}" placeholder="https://zoom.us/j/..."></div>
+    </div>
+    <div class="form-row full"><div class="form-field"><label class="form-label">Necesidades detectadas</label><textarea class="form-textarea" id="fNecesidades" placeholder="Ej: Necesita inglés para reuniones...">${escHtml(appt?.necesidades||'')}</textarea></div></div>
     ${isEdit?`<div class="form-row full"><div class="form-field"><label class="form-label">Estado</label>
       <div class="status-select-wrap"><div class="status-dot" id="statusDot"></div>
         <select class="form-select" id="fEstado">${['Pendiente','Asistió','No asistió','Contrató','No interesado','Reagendada'].map(v=>`<option${appt?.estado===v?' selected':''}>${v}</option>`).join('')}</select>
@@ -67,10 +76,12 @@ export async function openFormModal(id = null) {
     const data = { nombre, telefono, fecha, hora,
       interes:       document.getElementById('fInteres').value.trim(),
       areaLaboral:   document.getElementById('fAreaLaboral').value.trim(),
+      nivelIngles:   document.getElementById('fNivelIngles').value,
       origenLead:    document.getElementById('fOrigenLead').value,
       duracion:      parseInt(document.getElementById('fDuracion').value) || 30,
       zoomLink:      document.getElementById('fZoomLink').value.trim(),
       estado:        isEdit ? document.getElementById('fEstado').value : 'Pendiente',
+      necesidades:   document.getElementById('fNecesidades').value.trim(),
       observaciones: document.getElementById('fObs').value.trim()
     };
     if (isEdit) { data.id = id; await appointments.update(data); toast('Cita actualizada','success'); }
@@ -101,7 +112,14 @@ export async function openFormModalFromLead(leadId) {
       <div class="form-field"><label class="form-label">Interés / producto</label><input class="form-input" id="fInteres" value="${escHtml(lead.interes||'')}"></div>
       <div class="form-field"><label class="form-label">Duración (min)</label><input class="form-input" id="fDuracion" type="number" value="30" min="15" max="240" step="15"></div>
     </div>
+    <div class="form-row">
+      <div class="form-field"><label class="form-label">Área laboral</label><input class="form-input" id="fAreaLaboral" value="${escHtml(lead.areaLaboral||'')}"></div>
+      <div class="form-field"><label class="form-label">Nivel de inglés</label>
+        <select class="form-select" id="fNivelIngles"><option value="">Sin evaluar</option>${NIVELES_INGLES.map(v=>`<option${lead.nivelIngles===v?' selected':''}>${v}</option>`).join('')}</select>
+      </div>
+    </div>
     <div class="form-row full"><div class="form-field"><label class="form-label">Link Zoom</label><input class="form-input" id="fZoomLink" placeholder="https://zoom.us/j/..."></div></div>
+    <div class="form-row full"><div class="form-field"><label class="form-label">Necesidades detectadas</label><textarea class="form-textarea" id="fNecesidades" placeholder="Ej: Necesita inglés para reuniones..."></textarea></div></div>
     <div class="form-row full"><div class="form-field"><label class="form-label">Observaciones</label><textarea class="form-textarea" id="fObs">${escHtml(lead.observaciones||'')}</textarea></div></div>
     <div id="conflictBox"></div>`;
   initTimePicker('fHora');
@@ -124,10 +142,13 @@ export async function openFormModalFromLead(leadId) {
       telefono:     lead.telefono||'',
       fecha, hora,
       interes:      document.getElementById('fInteres').value.trim(),
+      areaLaboral:  document.getElementById('fAreaLaboral').value.trim(),
+      nivelIngles:  document.getElementById('fNivelIngles').value,
       origenLead:   lead.origen||'',
       duracion:     parseInt(document.getElementById('fDuracion').value)||30,
       zoomLink:     document.getElementById('fZoomLink').value.trim(),
       estado:       'Pendiente',
+      necesidades:  document.getElementById('fNecesidades').value.trim(),
       observaciones:document.getElementById('fObs').value.trim(),
       leadId:       lead.id
     });

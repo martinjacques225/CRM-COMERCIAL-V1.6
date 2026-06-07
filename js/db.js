@@ -106,11 +106,13 @@ export const appointments = {
   async update(data) {
     let prev = null;
     try { prev = await this.get(data.id); } catch {}
-    data.fechaActualizacion = new Date().toISOString();
-    const r = await wrap(tx('appointments', 'readwrite').put(data));
-    if (prev && prev.estado !== data.estado) {
-      if (data.estado === 'Reagendada') _logEvent('reagenda', 'Cita reagendada', data.nombre || '', data.id);
-      else if (data.estado === 'Contrató') _logEvent('venta', 'Cita marcada como contrató', data.nombre || '', data.id);
+    // Merge: nunca perder campos que el formulario no reenvía (ej. leadId, fechaCreacion)
+    const merged = prev ? { ...prev, ...data } : { ...data };
+    merged.fechaActualizacion = new Date().toISOString();
+    const r = await wrap(tx('appointments', 'readwrite').put(merged));
+    if (prev && prev.estado !== merged.estado) {
+      if (merged.estado === 'Reagendada') _logEvent('reagenda', 'Cita reagendada', merged.nombre || '', merged.id);
+      else if (merged.estado === 'Contrató') _logEvent('venta', 'Cita marcada como contrató', merged.nombre || '', merged.id);
     }
     return r;
   },
@@ -145,10 +147,18 @@ export const leads = {
   async update(data) {
     let prev = null;
     try { prev = await this.get(data.id); } catch {}
-    data.fechaActualizacion = new Date().toISOString();
-    const r = await wrap(tx('leads', 'readwrite').put(data));
-    if (prev && prev.estado !== data.estado && data.estado) {
-      _logEvent('lead_estado', `Lead en ${String(data.estado).toLowerCase()}`, `${data.nombre || ''} ${data.apellido || ''}`.trim(), data.id);
+    // Merge: preservar historial/avatar/fechaCreacion que el formulario no reenvía
+    const merged = prev ? { ...prev, ...data } : { ...data };
+    merged.fechaActualizacion = new Date().toISOString();
+    if (!Array.isArray(merged.historial)) merged.historial = [];
+    const cambioEstado = prev && data.estado && prev.estado !== data.estado;
+    if (cambioEstado) {
+      // Registro automático del cambio de estado en el timeline del lead
+      merged.historial.unshift({ tipo: 'estado', desc: `Estado: ${prev.estado || '—'} → ${data.estado}`, from: prev.estado || '', to: data.estado, timestamp: new Date().toISOString() });
+    }
+    const r = await wrap(tx('leads', 'readwrite').put(merged));
+    if (cambioEstado) {
+      _logEvent('lead_estado', `Lead en ${String(data.estado).toLowerCase()}`, `${merged.nombre || ''} ${merged.apellido || ''}`.trim(), merged.id);
     }
     return r;
   },

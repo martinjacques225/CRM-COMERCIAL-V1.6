@@ -187,11 +187,12 @@ export function attachCardEvents() {
       e.stopPropagation();
       const { action, id, tel, zoom, nombre, type } = btn.dataset, numId = parseInt(id);
       const app = window._app;
-      if      (action==='call')         { app?.autoLogCall?.({ apptId:numId, nombre, telefono:tel }); window.open(`tel:${tel}`); }
+      if      (action==='call')         { const c = type==='lead' ? { leadId:numId, nombre, telefono:tel } : { apptId:numId, nombre, telefono:tel }; app?.autoLogCall?.(c); window.open(`tel:${tel}`); }
       else if (action==='wa')           app?.openWAModal?.(numId, type||'appt');
       else if (action==='zoom')         window.open(zoom,'_blank');
       else if (action==='edit')         app?.openFormModal?.(numId);
       else if (action==='edit-lead')    app?.openLeadModal?.(numId);
+      else if (action==='view-lead')    app?.openLeadDetail?.(numId);
       else if (action==='agendar-lead') app?.openFormModalFromLead?.(numId);
       else if (action==='reagendar')    app?.openReagendarModal?.(numId);
       else if (action==='delete-appt')  app?.deleteAppointment?.(numId);
